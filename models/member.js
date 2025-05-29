@@ -26,28 +26,21 @@ const memberSchema = new mongoose.Schema({
     },
     spouseSignature:{
         type:String,
-        required:true,
+       
     },
     fatherName:{
         type:String,
-        validate: {
-            validator: function (value) {
-                return value || this.husbandName;
-            },
-            message: 'Either fatherName or husbandName is required.'
-        }
+       required:true
         
     },
-    husbandName:{
-        type:String,
-    },
+   
     mobile:{
         type:String,
         required:true,
     },
     spouseMobile:{
         type:String,
-        required:true,
+        
     },
     email:{
         type:String,
@@ -55,7 +48,7 @@ const memberSchema = new mongoose.Schema({
     },
     spouseEmail:{
         type:String,
-        required:true,
+        
     },
     address:{
         type:String,
@@ -76,6 +69,12 @@ const memberSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    membership:{
+        type:String,
+        required:true,
+        enum: ["साधारण सभासद-द्विवार्षिक सत्र के लिए - 300 रुपये", "आजीवन सभासद - एकल - 600 रुपये", "आजीवन सभासद - युगल-(पति-पत्नी) - 1000 रुपये","डुप्लिकेट परिचय शुल्क - ₹50 रुपये"],
+        
+    }
 
 },{ timestamps: true });
 
