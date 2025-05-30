@@ -10,6 +10,7 @@ const formRoute = require("./routes/form");
 const loginRoute = require("./routes/login");
 const adminRoute = require("./routes/admin")
 const memberRoute = require("./routes/member")
+const paymentRoute= require("./routes/payment")
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use("/api/v1/form", formRoute);
 app.use("/api/v1", loginRoute);
 app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/member", memberRoute);
+app.use("/api/v1", paymentRoute);
 
 // Upload Route (for React frontend)
 app.post("/upload", upload.single("file"), async (req, res) => {

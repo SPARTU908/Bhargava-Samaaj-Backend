@@ -1,7 +1,7 @@
 const Member = require("../models/member.js");
 
 const createMember = async (req, res) => {
-  console.log("hi")
+ 
   try {
     const member = new Member(req.body);
     await member.save();
