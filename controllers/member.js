@@ -12,4 +12,15 @@ const createMember = async (req, res) => {
   }
 };
 
-module.exports = { createMember };
+
+const getAllMembers = async (req, res) => {
+  try {
+    const members = await Member.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: members });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+module.exports = { createMember , getAllMembers};

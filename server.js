@@ -60,7 +60,7 @@ app.use("/api/v1/form", formRoute);
 app.use("/api/v1", loginRoute);
 app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/member", memberRoute);
-app.use("/api/v1", paymentRoute);
+app.use("/api/v1/payment", paymentRoute);
 
 // Upload Route (for React frontend)
 app.post("/upload", upload.single("file"), async (req, res) => {
@@ -81,8 +81,8 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       url: cloudinaryResponse.secure_url,
     });
 
-    console.log("Cloudinary response:", cloudinaryResponse);
-    console.log("Saved to DB:", savedToDb);
+    // console.log("Cloudinary response:", cloudinaryResponse);
+    // console.log("Saved to DB:", savedToDb);
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ error: "File upload failed" });
