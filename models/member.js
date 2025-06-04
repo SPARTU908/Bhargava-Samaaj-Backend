@@ -73,8 +73,20 @@ const memberSchema = new mongoose.Schema({
         type:String,
         required:true,
         enum: ["साधारण सभासद-द्विवार्षिक सत्र के लिए - 300 रुपये", "आजीवन सभासद - एकल - 600 रुपये", "आजीवन सभासद - युगल-(पति-पत्नी) - 1000 रुपये","डुप्लिकेट परिचय शुल्क - ₹50 रुपये"],
-        
-    }
+    },
+    reference:{
+        type:String,
+        required:true,
+    },
+    abbsNumber:{
+        type:Number,
+        required:true,
+    },
+    referenceNumber:{
+        type:Number,
+        required:true,
+    },
+
 
 },{ timestamps: true });
 
