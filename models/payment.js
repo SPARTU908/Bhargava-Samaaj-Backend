@@ -17,6 +17,9 @@ const paymentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  uploadForm:{
+    type:String,
+  }
 });
 
 module.exports = mongoose.model("Payment", paymentSchema);
