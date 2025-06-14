@@ -38,7 +38,7 @@ const userFormSchema = new mongoose.Schema({
   city: String,
   pin: Number,
   whatsapp: Number,
-  residence: String,
+  // residence: String,
   nri: String,
   remarks: String,
   password: String,
