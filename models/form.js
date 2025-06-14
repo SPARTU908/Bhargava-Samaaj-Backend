@@ -45,8 +45,7 @@ const userFormSchema = new mongoose.Schema({
   photo: String,
   bioData: String,
 
-
-  status: {
+status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
