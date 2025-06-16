@@ -1,16 +1,17 @@
 const UserForm = require("../models/form");
-const bcrypt = require("bcryptjs"); 
+const bcrypt = require("bcryptjs");
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-console.log(email)
+    console.log(email);
     const user = await UserForm.findOne({ email });
-    console.log(user)
+    console.log(user);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const isMatch = (password=== user.password);
+    const isMatch = password === user.password;
     if (!isMatch) {
       return res.status(401).json({ error: "Incorrect password" });
     }

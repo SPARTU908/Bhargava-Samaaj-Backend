@@ -64,9 +64,26 @@ const reviewForm = async (req, res) => {
   }
 };
 
+const getUserStatus = async (req, res) => {
+  try {
+    const { email } = req.params; // or use ID if available
+    const user = await UserForm.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+   res.status(200).json({ status: user.status });
+  } catch (error) {
+    console.error("Error fetching user status:", error);
+    res.status(500).json({ error: "Failed to fetch user status" });
+  }
+};
+
+
+
 module.exports = {
   saveFormData,
   getApprovedFormData,
   getPendingFormData,
   reviewForm,
+  getUserStatus,
 };
