@@ -10,7 +10,7 @@ const seedRoutes = require('./routes/seed');
 
 const formRoute = require("./routes/form");
 const loginRoute = require("./routes/login");
-const adminRoute = require("./routes/admin");
+// const adminRoute = require("./routes/admin");
 const memberRoute = require("./routes/member");
 const paymentRoute= require("./routes/payment");
 const authRoute = require("./routes/auth");
@@ -62,7 +62,7 @@ mongoose
 // Routes
 app.use("/api/v1/form", formRoute);
 app.use("/api/v1", loginRoute);
-app.use("/api/v1/admin", adminRoute);
+// app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/member", memberRoute);
 app.use("/api/v1/payment", paymentRoute);
 app.use('/api/auth', authRoute);

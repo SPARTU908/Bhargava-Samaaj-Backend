@@ -50,18 +50,18 @@ module.exports = router;
 //       },
 //       {
 //         email: 'membershipadmin@example.com',
-//         password: 'membership123', 
+//         password: 'membership123',
 //         role: 'membershipadmin',
 //       },
 //       {
 //         email: 'vivahparamarsh@gmail.com',
-//         password: 'vivah@paramarsh', 
+//         password: 'vivah@paramarsh',
 //         role: 'matrimonialadmin',
 //       },
 //     ];
 
 //     await User.insertMany(users);
-//     res.status(201).json({ message: 'Dummy admins seeded with plain-text passwords' });
+//     res.status(201).json({ message: 'Dummy admins seeded successfully' });
 //   } catch (error) {
 //     console.error('Error seeding users:', error);
 //     res.status(500).json({ error: 'Failed to seed users' });
