@@ -22,5 +22,15 @@ const getAllMembers = async (req, res) => {
   }
 };
 
+const getMemberCount = async (req, res) => {
+  try {
+    const count = await Member.countDocuments();
+      res.status(200).json({ count }); 
+  } catch (error) {
+    console.log("Error fetching pending form count:", error);
+    res.status(500).json({ error: "Failed to fetch count" });
+  }
+};
 
-module.exports = { createMember , getAllMembers};
+
+module.exports = { createMember , getAllMembers, getMemberCount};
