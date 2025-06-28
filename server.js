@@ -5,25 +5,21 @@ const multer = require("multer");
 const path = require("path");
 const { v2: cloudinary } = require("cloudinary");
 require("dotenv").config();
-const seedRoutes = require('./routes/seed');
-
+const seedRoutes = require("./routes/seed");
 
 const formRoute = require("./routes/form");
 const loginRoute = require("./routes/login");
-// const adminRoute = require("./routes/admin");
 const memberRoute = require("./routes/member");
-const paymentRoute= require("./routes/payment");
+const paymentRoute = require("./routes/payment");
 const authRoute = require("./routes/auth");
-
 
 const app = express();
 
 // Cloudinary config
 cloudinary.config({
-  cloud_name: 'doj76lpfe',
-  api_key:'362821681467625',
-  api_secret: 'twv0zQP_E0Qu7mAswUAqEMGMSOo',
-
+  cloud_name: "doj76lpfe",
+  api_key: "362821681467625",
+  api_secret: "twv0zQP_E0Qu7mAswUAqEMGMSOo",
 });
 
 // Multer config
@@ -65,15 +61,20 @@ app.use("/api/v1", loginRoute);
 // app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/member", memberRoute);
 app.use("/api/v1/payment", paymentRoute);
-app.use('/api/auth', authRoute);
-app.use('/api/seed', seedRoutes);
+app.use("/api/auth", authRoute);
+app.use("/api/seed", seedRoutes);
 
-// Upload Route (for React frontend)
+
 app.post("/upload", upload.single("file"), async (req, res) => {
   try {
     const filePath = req.file.path;
+    const fileType = path.extname(req.file.originalname).toLowerCase();
+
+    const resourceType = fileType === ".pdf" ? "raw" : "image";
+
     const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {
-      folder: "images",
+      folder: "uploads",
+      resource_type: resourceType,
     });
 
     const savedToDb = await File.create({
@@ -86,16 +87,11 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       message: "File uploaded successfully",
       url: cloudinaryResponse.secure_url,
     });
-
-    // console.log("Cloudinary response:", cloudinaryResponse);
-    // console.log("Saved to DB:", savedToDb);
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ error: "File upload failed" });
   }
 });
-
-
 
 // Fallbacks
 app.use("*", (req, res) => {
@@ -112,4 +108,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Backend server running on ${port}`);
 });
-
