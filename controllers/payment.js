@@ -39,7 +39,7 @@ const savePayment = async (req, res) => {
     );
 
     res.status(200).json({
-      message: "Payment saved or updated successfully",
+      message: "Payment saved successfully",
       data: updatedPayment,
     });
   } catch (error) {
