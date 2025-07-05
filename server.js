@@ -12,6 +12,7 @@ const loginRoute = require("./routes/login");
 const memberRoute = require("./routes/member");
 const paymentRoute = require("./routes/payment");
 const authRoute = require("./routes/auth");
+const vivahRoute = require("./routes/vivahMemberRegister");
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use("/api/v1/member", memberRoute);
 app.use("/api/v1/payment", paymentRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/seed", seedRoutes);
+app.use("/api/v1",vivahRoute);
 
 
 app.post("/upload", upload.single("file"), async (req, res) => {
