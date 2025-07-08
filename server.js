@@ -47,6 +47,12 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cors({
+  origin: "https://bhargavasamajglobal.org", // or "*" to allow all (not recommended for production)
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URL)
