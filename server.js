@@ -522,7 +522,7 @@ app.use((error, req, res, next) => {
   res.status(500).json({ errorMessage: "Something went wrong" });
 });
 
-// ✅ Start Server
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Backend server running on ${port}`);
