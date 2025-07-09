@@ -1,4 +1,5 @@
 const UserForm = require("../models/form.js");
+const sendEmail = require("../mailsend.js");
 
 const saveFormData = async (req, res) => {
   try {
@@ -33,6 +34,73 @@ const getPendingFormData = async (req, res) => {
   }
 };
 
+// const reviewForm = async (req, res) => {
+//   try {
+//     const { formId, action } = req.body;
+
+//     if (!["approve", "reject"].includes(action)) {
+//       return res.status(400).json({ message: "Invalid action" });
+//     }
+
+//     const updatedForm = await UserForm.findByIdAndUpdate(
+//       formId,
+//       { status: action === "approve" ? "approved" : "rejected" },
+//       { new: true }
+//     );
+
+//     if (!updatedForm) {
+//       return res.status(404).json({ message: "Form not found" });
+//     }
+
+//     res.status(200).json({
+//       message: `Form ${action}d successfully`,
+//       form: updatedForm,
+//     });
+//   } catch (error) {
+//     console.error("Error reviewing form:", error);
+//     res.status(500).json({ error: "Failed to review form" });
+//   }
+// };
+
+// const reviewForm = async (req, res) => {
+//   try {
+//     const { formId, action } = req.body;
+
+//     if (!["approve", "reject"].includes(action)) {
+//       return res.status(400).json({ message: "Invalid action" });
+//     }
+
+//     const updatedForm = await UserForm.findByIdAndUpdate(
+//       formId,
+//       { status: action === "approve" ? "approved" : "rejected" },
+//       { new: true }
+//     );
+
+//     if (!updatedForm) {
+//       return res.status(404).json({ message: "Form not found" });
+//     }
+
+//     // ✅ Send email on approval
+//     if (action === "approve") {
+//       await sendEmail({
+//         to: updatedForm.email,
+//         subject: "Form Approved",
+//         text: `Hello ${updatedForm.name}, .`,
+//         html: `<p>Hello <strong>${updatedForm.name}</strong>,Your login request has been approved . Please login and explore biodatas.</p>`,
+//       });
+//     }
+
+//     res.status(200).json({
+//       message: `Form ${action}d successfully`,
+//       form: updatedForm,
+//     });
+//   } catch (error) {
+//     console.error("Error reviewing form:", error);
+//     res.status(500).json({ error: "Failed to review form" });
+//   }
+// };
+
+
 const reviewForm = async (req, res) => {
   try {
     const { formId, action } = req.body;
@@ -49,6 +117,32 @@ const reviewForm = async (req, res) => {
 
     if (!updatedForm) {
       return res.status(404).json({ message: "Form not found" });
+    }
+
+    // Send email on approval
+    if (action === "approve") {
+      await sendEmail({
+        to: updatedForm.email,
+        subject: "Form Approved",
+        text: `Hello ${updatedForm.name}, your login request has been approved. Visit: https://bhargavasamajglobal.org/`,
+        html: `
+          <p>Hello <strong>${updatedForm.name}</strong>,</p>
+          <p>Your login request has been <b>approved</b>. Please click the button below to login and explore biodatas.</p>
+          <p>
+            <a href="https://bhargavasamajglobal.org/" style="
+              display: inline-block;
+              padding: 10px 20px;
+              background-color: #4CAF50;
+              color: #fff;
+              text-decoration: none;
+              border-radius: 5px;
+            ">
+              Login
+            </a>
+          </p>
+          <p>Thank you,<br>Bhargava Samaaj Global</p>
+        `,
+      });
     }
 
     res.status(200).json({
