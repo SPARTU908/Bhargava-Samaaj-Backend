@@ -516,7 +516,7 @@ app.use("*", (req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// ✅ Global Error Handler
+
 app.use((error, req, res, next) => {
   console.error("Error:", error.message);
   res.status(500).json({ errorMessage: "Something went wrong" });
