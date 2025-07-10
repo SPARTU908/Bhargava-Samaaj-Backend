@@ -129,7 +129,7 @@ const reviewForm = async (req, res) => {
           <p>Hello <strong>${updatedForm.name}</strong>,</p>
           <p>Your login request has been <b>approved</b>. Please click the button below to login and explore biodatas.</p>
           <p>
-            <a href="https://bhargavasamajglobal.org/" style="
+            <a href="https://bhargavasamajglobal.org/findyourmatch/" style="
               display: inline-block;
               padding: 10px 20px;
               background-color: #4CAF50;

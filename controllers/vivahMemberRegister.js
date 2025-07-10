@@ -1,5 +1,6 @@
 const VivahMember = require("../models/vivahMemberRegister");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../mailsend.js");
 
 const registerMember = async (req, res) => {
   console.log("Received data:", req.body);
@@ -125,6 +126,43 @@ const getPendingMembers = async (req, res) => {
 };
 
 // Approve or reject a Vivah Member by ID
+// const reviewVivahMember = async (req, res) => {
+//   try {
+//     const { memberId, action } = req.body;
+
+//     if (!["approve", "reject"].includes(action)) {
+//       return res.status(400).json({ error: "Invalid action" });
+//     }
+
+//     const user = await VivahMember.findById(memberId);
+//     if (!user) {
+//       return res.status(404).json({ error: "Member not found" });
+//     }
+
+//     // 🔁 Toggle logic
+//     let newStatus = "pending";
+//     if (action === "approve") {
+//       newStatus = user.status === "approved" ? "pending" : "approved";
+//     } else if (action === "reject") {
+//       newStatus = user.status === "rejected" ? "pending" : "rejected";
+//     }
+
+//     user.status = newStatus;
+//     await user.save();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: `Member status updated to ${newStatus}`,
+//       member: user,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       error: "Server error",
+//       details: err.message,
+//     });
+//   }
+// };
+
 const reviewVivahMember = async (req, res) => {
   try {
     const { memberId, action } = req.body;
@@ -149,18 +187,47 @@ const reviewVivahMember = async (req, res) => {
     user.status = newStatus;
     await user.save();
 
+    // ✅ Send email if approved
+    if (newStatus === "approved") {
+      await sendEmail({
+        to: user.email,
+        subject: "Form Approved",
+        text: `Hello ${user.name},`,
+        html: `
+          <p>Hello <strong>${user.name}</strong>,</p>
+          <p>Your login request has been <b>approved</b>. Please click the button below to login and explore biodatas.</p>
+          <p>
+            <a href="https://bhargavasamajglobal.org/vivahmemberlogin" style="
+              display: inline-block;
+              padding: 10px 20px;
+              background-color: #4CAF50;
+              color: #fff;
+              text-decoration: none;
+              border-radius: 5px;
+            ">
+              Login
+            </a>
+          </p>
+          <p>Thank you,<br>Bhargava Samaaj Global</p>
+        `,
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: `Member status updated to ${newStatus}`,
       member: user,
     });
   } catch (err) {
+    console.error("Error reviewing Vivah member:", err);
     return res.status(500).json({
       error: "Server error",
       details: err.message,
     });
   }
 };
+
+
 
 module.exports = {
   registerMember,
