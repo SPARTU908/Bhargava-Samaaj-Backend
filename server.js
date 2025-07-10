@@ -488,6 +488,8 @@ mongoose
   });
 
 // ✅ Routes
+
+app.use(limiter);
 app.use("/api/v1/form", formRoute);
 app.use("/api/v1", loginRoute);
 app.use("/api/v1/member", memberRoute);
@@ -495,7 +497,7 @@ app.use("/api/v1/payment", paymentRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/seed", seedRoutes);
 app.use("/api/v1", vivahRoute);
-app.use(limiter);
+
 
 // ✅ File Upload Route
 app.post("/upload", upload.single("file"), async (req, res) => {
