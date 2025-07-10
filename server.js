@@ -402,8 +402,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
+const rateLimit = require('express-rate-limit');
 const { v2: cloudinary } = require("cloudinary");
 require("dotenv").config();
+
 
 const seedRoutes = require("./routes/seed");
 const formRoute = require("./routes/form");
@@ -422,6 +424,7 @@ app.use((req, res, next) => {
     "https://bhargavasamajglobal.org"
   ];
   const origin = req.headers.origin;
+   console.log("CORS check, origin:", origin);
 
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -430,7 +433,7 @@ app.use((req, res, next) => {
 
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
+  // res.setHeader("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
@@ -448,6 +451,15 @@ cloudinary.config({
   cloud_name: "doj76lpfe",
   api_key: "362821681467625",
   api_secret: "twv0zQP_E0Qu7mAswUAqEMGMSOo",
+});
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 90,             // limit each IP to 90 requests per minute
+  message: {
+    status: 429,
+    error: "Too many requests. Please try again in a minute.",
+  }
 });
 
 // ✅ Multer Setup
@@ -483,6 +495,7 @@ app.use("/api/v1/payment", paymentRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/seed", seedRoutes);
 app.use("/api/v1", vivahRoute);
+app.use(limiter);
 
 // ✅ File Upload Route
 app.post("/upload", upload.single("file"), async (req, res) => {
