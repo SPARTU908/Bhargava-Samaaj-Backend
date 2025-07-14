@@ -1,5 +1,5 @@
 const express = require('express');
-const {createMember,uploadFormFile} = require('../controllers/membership');
+const {createMember,uploadFormFile,loginMember} = require('../controllers/membership');
 const {getAllMembers} = require("../controllers/membership");
  const {getMemberCount} = require("../controllers/membership");
 const { protect } = require('../middleware/authMiddleware');
@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }); // ✅ define 'upload'
 
 
-
+router.post('/login/member',loginMember);
 router.post('/register', createMember);
 router.post('/:id/upload', upload.single('uploadForm'), uploadFormFile);
 router.get("/allmember", getAllMembers);
