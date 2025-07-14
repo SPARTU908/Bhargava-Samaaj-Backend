@@ -50,12 +50,12 @@ module.exports = router;
 //       },
 //       {
 //         email: 'membershipadmin@example.com',
-//         password: 'membership123',
+//         password: 'membership345',
 //         role: 'membershipadmin',
 //       },
 //       {
-//         email: 'vivahparamarsh@gmail.com',
-//         password: 'vivah@paramarsh',
+//         email: 'matrimonialadmin@example.com',
+//         password: 'matrimonial567',
 //         role: 'matrimonialadmin',
 //       },
 //     ];

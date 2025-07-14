@@ -17,7 +17,7 @@ const createPayment = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Payment recorded successfully",
+      message: "Payment received successfully",
       payment,
     });
   } catch (error) {
