@@ -15,6 +15,34 @@ const createMember = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+  
+};
+
+const loginMember = async (req, res) => {
+  try {
+    const { name, membership } = req.body;
+    if (!name || !membership) {
+      return res.status(400).json({ message: "Name and membership are required" });
+    }
+    const member = await Member.findOne({ name, membership });
+
+    if (!member) {
+      return res.status(404).json({ message: "Member not found or invalid credentials" });
+    }
+  const token = jwt.sign({ memberId: member._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h", 
+    });
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      memberId: member._id,
+      membership: member.membership,
+    });
+  } catch (error) {
+    console.error("Login failed:", error);
+    res.status(500).json({ message: "Server error", details: error.message });
+  }
 };
 
 
@@ -82,4 +110,4 @@ const getMemberCount = async (req, res) => {
 };
 
 
-module.exports = { createMember , getAllMembers, getMemberCount ,uploadFormFile};
+module.exports = { createMember , getAllMembers, getMemberCount ,uploadFormFile,loginMember};
