@@ -2,6 +2,7 @@ const Member = require("../models/membership.js");
 const fs = require("fs");
 const path = require("path");
 const cloudinary = require("../utils/cloudinary");
+const jwt = require('jsonwebtoken');
 
 const createMember = async (req, res) => {
   try {
@@ -20,11 +21,11 @@ const createMember = async (req, res) => {
 
 const loginMember = async (req, res) => {
   try {
-    const { name, membership } = req.body;
-    if (!name || !membership) {
+    const { username, membership } = req.body;
+    if (!username || !membership) {
       return res.status(400).json({ message: "Name and membership are required" });
     }
-    const member = await Member.findOne({ name, membership });
+    const member = await Member.findOne({ username, membership });
 
     if (!member) {
       return res.status(404).json({ message: "Member not found or invalid credentials" });
