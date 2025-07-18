@@ -79,6 +79,7 @@ const memberSchema = new mongoose.Schema(
     uploadForm: {
       type: String,
     },
+    isFormApproved: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
