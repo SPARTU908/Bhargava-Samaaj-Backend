@@ -89,6 +89,28 @@ const uploadFormFile = async (req, res) => {
   }
 };
 
+const getMemberStatus = async (req, res) => {
+  try {
+    const memberId = req.params.id;
+    const member = await Member.findById(memberId);
+    if (!member) {
+      return res.status(404).json({ success: false, message: "Member not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        approved: member.isFormApproved,
+        uploadForm: member.uploadForm,
+      },
+    });
+  } catch (error) {
+    console.error("Status fetch failed:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
 
 
 const getAllMembers = async (req, res) => {
@@ -102,7 +124,8 @@ const getAllMembers = async (req, res) => {
 
 const getMemberCount = async (req, res) => {
   try {
-    const count = await Member.countDocuments();
+    const count = await Member.countDocuments({ isFormApproved: false });
+    console.log(count)
       res.status(200).json({ count }); 
   } catch (error) {
     console.log("Error fetching pending form count:", error);
@@ -110,5 +133,90 @@ const getMemberCount = async (req, res) => {
   }
 };
 
+const updateMemberStatus = async (req, res) => {
+  try {
+    const memberId = req.params.id;
+    const { isFormApproved } = req.body;
+if (typeof isFormApproved !== "boolean") {
+      return res.status(400).json({ message: "isFormApproved must be a boolean" });
+    }
 
-module.exports = { createMember , getAllMembers, getMemberCount ,uploadFormFile,loginMember};
+    const updatedMember = await Member.findByIdAndUpdate(
+      memberId,
+      { isFormApproved },
+      { new: true }
+    );
+
+    if (!updatedMember) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    res.status(200).json({
+      message: "Member status updated successfully",
+      member: updatedMember,
+    });
+  } catch (error) {
+    console.error("Error updating member status:", error);
+    res.status(500).json({ message: "Internal server error", details: error.message });
+  }
+};
+
+// const updateMemberStatus = async (req, res) => {
+//   try {
+//     const memberId = req.params.id;
+//     const { isFormApproved } = req.body;
+
+//     if (typeof isFormApproved !== "boolean") {
+//       return res.status(400).json({ message: "isFormApproved must be a boolean" });
+//     }
+
+//     const updatedMember = await Member.findByIdAndUpdate(
+//       memberId,
+//       { isFormApproved },
+//       { new: true }
+//     );
+
+//     if (!updatedMember) {
+//       return res.status(404).json({ message: "Member not found" });
+//     }
+
+//     // Send email when the form is approved
+//     if (isFormApproved) {
+//       // Send an email using the sendEmail utility function
+//       await sendEmail({
+//         to: updatedMember.email, // assuming the member object has an email field
+//         subject: "Your Form has been Approved",
+//         text: `Hello , your form has been approved.`,
+//         html: `
+//           <p>Hello <strong></strong>,</p>
+//           <p>Your form has been <b>approved</b>. Thank you for your submission!Now.Login and proceed to pay.</p>
+//         <p>
+//             <a href="https://bhargavasamajglobal.org/payment" style="
+//               display: inline-block;
+//               padding: 10px 20px;
+//               background-color: #4CAF50;
+//               color: #fff;
+//               text-decoration: none;
+//               border-radius: 5px;
+//             ">
+//               Login
+//             </a>
+//           </p>
+//           <p>Thank you,<br>Bhargava Samaaj Global</p>
+//         `,
+//       });
+//     }
+
+//     res.status(200).json({
+//       message: "Member status updated successfully",
+//       member: updatedMember,
+//     });
+//   } catch (error) {
+//     console.error("Error updating member status:", error);
+//     res.status(500).json({ message: "Internal server error", details: error.message });
+//   }
+// };
+
+
+
+module.exports = { createMember , getAllMembers, getMemberCount ,uploadFormFile,loginMember,getMemberStatus,  updateMemberStatus,};
