@@ -199,7 +199,7 @@ const updateMemberStatus = async (req, res) => {
           <p>Hello <strong></strong>,</p>
           <p>Your form has been <b>approved</b>. Thank you for your submission!Now.Login and proceed to pay.</p>
         <p>
-            <a href="https://bhargavasamajglobal.org/payment" style="
+            <a href="https://bhargavasamajglobal.org/payment1" style="
               display: inline-block;
               padding: 10px 20px;
               background-color: #4CAF50;
