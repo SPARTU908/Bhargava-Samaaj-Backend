@@ -19,21 +19,52 @@ const createMember = async (req, res) => {
   }
 };
 
+// const loginMember = async (req, res) => {
+//   try {
+//     const { username, membership } = req.body;
+//     if (!username || !membership) {
+//       return res
+//         .status(400)
+//         .json({ message: "Name and membership are required" });
+//     }
+//     const member = await Member.findOne({ username, membership });
+
+//     if (!member) {
+//       return res
+//         .status(404)
+//         .json({ message: "Member not found or invalid credentials" });
+//     }
+//     const token = jwt.sign({ memberId: member._id }, process.env.JWT_SECRET, {
+//       expiresIn: "1h",
+//     });
+
+//     res.status(200).json({
+//       message: "Login successful",
+//       token,
+//       memberId: member._id,
+//       membership: member.membership,
+//     });
+//   } catch (error) {
+//     console.error("Login failed:", error);
+//     res.status(500).json({ message: "Server error", details: error.message });
+//   }
+// };
+
+
+
 const loginMember = async (req, res) => {
   try {
     const { username, membership } = req.body;
     if (!username || !membership) {
-      return res
-        .status(400)
-        .json({ message: "Name and membership are required" });
+      return res.status(400).json({ message: "Name and membership are required" });
     }
+
     const member = await Member.findOne({ username, membership });
 
     if (!member) {
-      return res
-        .status(404)
-        .json({ message: "Member not found or invalid credentials" });
+      return res.status(404).json({ message: "Member not found or invalid credentials" });
     }
+
     const token = jwt.sign({ memberId: member._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
@@ -43,12 +74,15 @@ const loginMember = async (req, res) => {
       token,
       memberId: member._id,
       membership: member.membership,
+      uploadForm: member.uploadForm || null,
+      isFormApproved: member.isFormApproved || false,
     });
   } catch (error) {
     console.error("Login failed:", error);
     res.status(500).json({ message: "Server error", details: error.message });
   }
 };
+
 
 const uploadFormFile = async (req, res) => {
   try {
@@ -134,37 +168,6 @@ const getMemberCount = async (req, res) => {
   }
 };
 
-// const updateMemberStatus = async (req, res) => {
-//   try {
-//     const memberId = req.params.id;
-//     const { isFormApproved } = req.body;
-//     if (typeof isFormApproved !== "boolean") {
-//       return res
-//         .status(400)
-//         .json({ message: "isFormApproved must be a boolean" });
-//     }
-
-//     const updatedMember = await Member.findByIdAndUpdate(
-//       memberId,
-//       { isFormApproved },
-//       { new: true }
-//     );
-
-//     if (!updatedMember) {
-//       return res.status(404).json({ message: "Member not found" });
-//     }
-
-//     res.status(200).json({
-//       message: "Member status updated successfully",
-//       member: updatedMember,
-//     });
-//   } catch (error) {
-//     console.error("Error updating member status:", error);
-//     res
-//       .status(500)
-//       .json({ message: "Internal server error", details: error.message });
-//   }
-// };
 
 const updateMemberStatus = async (req, res) => {
   try {
