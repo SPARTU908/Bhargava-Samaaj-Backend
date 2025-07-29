@@ -106,6 +106,77 @@ const loginMember = async (req, res) => {
   }
 };
 
+// const loginMember = async (req, res) => {
+//   try {
+//     console.log("🔵 Login API called");
+
+//     const { email: rawEmail, password: rawPassword } = req.body;
+//     console.log("🔵 Raw input:", rawEmail, rawPassword);
+
+//     const email = rawEmail?.trim();
+//     const password = rawPassword?.trim();
+
+//     if (!email || !password) {
+//       console.log("🔴 Missing email or password");
+//       return res.status(400).json({ error: "Email and password are required" });
+//     }
+
+//     const user = await VivahMember.findOne({ email });
+//     console.log("🔵 Found user:", user?.email);
+
+//     if (!user) {
+//       console.log("🔴 User not found");
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     console.log(`Entered password: [${password}]`);
+//     console.log(`Stored password: [${user.password}]`);
+
+//     if (user.password.trim() !== password) {
+//       console.log("🔴 Invalid credentials");
+//       return res.status(401).json({ error: "Invalid credentials" });
+//     }
+
+//     if (user.status === "rejected") {
+//       console.log("🔴 Account rejected");
+//       return res.status(403).json({
+//         error: "Your account has been rejected. Please contact support.",
+//       });
+//     }
+
+//     if (user.status !== "approved") {
+//       console.log("🔴 Account not approved");
+//       return res.status(403).json({
+//         error: "Your account is not approved yet. Please wait for approval.",
+//       });
+//     }
+
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: "1h",
+//     });
+
+//     console.log("✅ Login successful");
+//     return res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token,
+//       user: {
+//         id: user._id,
+//         email: user.email,
+//         name: user.name,
+//         status: user.status,
+//       },
+//     });
+
+//   } catch (error) {
+//     console.error("🔴 Server error:", error.message);
+//     return res.status(500).json({
+//       error: "Server error",
+//       details: error.message,
+//     });
+//   }
+// };
+
 
 const getPendingMembers = async (req, res) => {
   try {
