@@ -127,6 +127,10 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Backend is working 🚀");
+});
+
 // ✅ 404 Fallback
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Route not found" });
