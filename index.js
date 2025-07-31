@@ -122,7 +122,7 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-app.get("/api/hello", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Backend is working 🚀");
 });
 
