@@ -7,13 +7,13 @@ const { v2: cloudinary } = require("cloudinary");
 const serverless = require("serverless-http");
 require("dotenv").config();
 
-const seedRoutes = require("../routes/seed");
-const formRoute = require("../routes/form");
-const loginRoute = require("../routes/login");
-const memberRoute = require("../routes/membership");
-const paymentRoute = require("../routes/payment");
-const authRoute = require("../routes/auth");
-const vivahRoute = require("../routes/vivahMemberRegister");
+const seedRoutes = require("./routes/seed");
+const formRoute = require("./routes/form");
+const loginRoute = require("./routes/login");
+const memberRoute = require("./routes/membership");
+const paymentRoute = require("./routes/payment");
+const authRoute = require("./routes/auth");
+const vivahRoute = require("./routes/vivahMemberRegister");
 
 const app = express();
 
