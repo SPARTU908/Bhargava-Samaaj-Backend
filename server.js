@@ -23,7 +23,7 @@ app.use((req, res, next) => {
     "https://bhargavasamajglobal.org"
   ];
   const origin = req.headers.origin;
-   console.log("CORS check, origin:", origin);
+   
 
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
