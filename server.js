@@ -99,32 +99,32 @@ app.use("/api/v1", vivahRoute);
 
 
 // ✅ File Upload Route
-app.post("/upload", upload.single("file"), async (req, res) => {
-  try {
-    const filePath = req.file.path;
-    const fileType = path.extname(req.file.originalname).toLowerCase();
-    const resourceType = fileType === ".pdf" ? "raw" : "image";
+// app.post("/upload", upload.single("file"), async (req, res) => {
+//   try {
+//     const filePath = req.file.path;
+//     const fileType = path.extname(req.file.originalname).toLowerCase();
+//     const resourceType = fileType === ".pdf" ? "raw" : "image";
 
-    const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {
-      folder: "uploads",
-      resource_type: resourceType,
-    });
+//     const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {
+//       folder: "uploads",
+//       resource_type: resourceType,
+//     });
 
-    const savedToDb = await File.create({
-      filename: req.file.originalname,
-      public_id: cloudinaryResponse.public_id,
-      imgUrl: cloudinaryResponse.secure_url,
-    });
+//     const savedToDb = await File.create({
+//       filename: req.file.originalname,
+//       public_id: cloudinaryResponse.public_id,
+//       imgUrl: cloudinaryResponse.secure_url,
+//     });
 
-    res.status(200).json({
-      message: "File uploaded successfully",
-      url: cloudinaryResponse.secure_url,
-    });
-  } catch (error) {
-    console.error("Upload error:", error);
-    res.status(500).json({ error: "File upload failed" });
-  }
-});
+//     res.status(200).json({
+//       message: "File uploaded successfully",
+//       url: cloudinaryResponse.secure_url,
+//     });
+//   } catch (error) {
+//     console.error("Upload error:", error);
+//     res.status(500).json({ error: "File upload failed" });
+//   }
+// });
 
 app.get("/", (req, res) => {
   res.send("Backend is working 🚀");
