@@ -98,7 +98,7 @@ const createPayment = async (req, res) => {
 
     <p>On behalf of <b> Bhargava Samaaj Global</b>, we sincerely thank you for your contribution and continued support towards our community initiatives.</p>
 
-    <p>If you have any questions or require assistance, please feel free to reply to this email.</p>
+    <p>We will review your form and revert back.If you have any questions or require assistance, please feel free to reply to this email.</p>
 
     <br/>
     <p>Warm Regards,</p>
