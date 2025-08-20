@@ -19,50 +19,21 @@ const createMember = async (req, res) => {
   }
 };
 
-// const loginMember = async (req, res) => {
-//   try {
-//     const { username, membership } = req.body;
-//     if (!username || !membership) {
-//       return res
-//         .status(400)
-//         .json({ message: "Name and membership are required" });
-//     }
-//     const member = await Member.findOne({ username, membership });
-
-//     if (!member) {
-//       return res
-//         .status(404)
-//         .json({ message: "Member not found or invalid credentials" });
-//     }
-//     const token = jwt.sign({ memberId: member._id }, process.env.JWT_SECRET, {
-//       expiresIn: "1h",
-//     });
-
-//     res.status(200).json({
-//       message: "Login successful",
-//       token,
-//       memberId: member._id,
-//       membership: member.membership,
-//     });
-//   } catch (error) {
-//     console.error("Login failed:", error);
-//     res.status(500).json({ message: "Server error", details: error.message });
-//   }
-// };
-
-
-
 const loginMember = async (req, res) => {
   try {
     const { username, membership } = req.body;
     if (!username || !membership) {
-      return res.status(400).json({ message: "Name and membership are required" });
+      return res
+        .status(400)
+        .json({ message: "Name and membership are required" });
     }
 
     const member = await Member.findOne({ username, membership });
 
     if (!member) {
-      return res.status(404).json({ message: "Member not found or invalid credentials" });
+      return res
+        .status(404)
+        .json({ message: "Member not found or invalid credentials" });
     }
 
     const token = jwt.sign({ memberId: member._id }, process.env.JWT_SECRET, {
@@ -82,7 +53,6 @@ const loginMember = async (req, res) => {
     res.status(500).json({ message: "Server error", details: error.message });
   }
 };
-
 
 const uploadFormFile = async (req, res) => {
   try {
@@ -160,14 +130,13 @@ const getAllMembers = async (req, res) => {
 
 const getMemberCount = async (req, res) => {
   try {
-    const count = await Member.countDocuments({ isFormApproved: false });
+    const count = await Member.countDocuments(); // sabhi documents count honge
     res.status(200).json({ count });
   } catch (error) {
-    console.log("Error fetching pending form count:", error);
+    console.log("Error fetching member count:", error);
     res.status(500).json({ error: "Failed to fetch count" });
   }
 };
-
 
 const updateMemberStatus = async (req, res) => {
   try {
@@ -175,7 +144,9 @@ const updateMemberStatus = async (req, res) => {
     const { isFormApproved } = req.body;
 
     if (typeof isFormApproved !== "boolean") {
-      return res.status(400).json({ message: "isFormApproved must be a boolean" });
+      return res
+        .status(400)
+        .json({ message: "isFormApproved must be a boolean" });
     }
 
     const updatedMember = await Member.findByIdAndUpdate(
@@ -221,7 +192,57 @@ const updateMemberStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating member status:", error);
-    res.status(500).json({ message: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", details: error.message });
+  }
+};
+
+// DISPATCH MEMBER FORM
+const dispatchMemberForm = async (req, res) => {
+  try {
+    const memberId = req.params.id;
+    const member = await Member.findById(memberId);
+
+    if (!member) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    // Prevent duplicate dispatch
+    if (member.isDispatched) {
+      return res
+        .status(400)
+        .json({ message: "This member is already dispatched" });
+    }
+
+    // Send dispatch email
+    await sendEmail({
+      to: member.email,
+      subject: "Membership Form Dispatched",
+      html: `
+        <p>Dear <strong>${member.username}</strong>,</p>
+        <p>We are pleased to inform you that your membership form has been successfully dispatched.  
+        You will be receiving it shortly at the address you provided.</p>
+        <p>Regards,<br>Bhargava Samaaj Global</p>
+      `,
+    });
+
+    // Update DB
+    member.isDispatched = true;
+    member.dispatchedAt = new Date();
+    await member.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Dispatch email sent successfully",
+      member,
+    });
+  } catch (error) {
+    console.error("Error in dispatchMemberForm:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to send dispatch email",
+    });
   }
 };
 
@@ -233,4 +254,5 @@ module.exports = {
   loginMember,
   getMemberStatus,
   updateMemberStatus,
+  dispatchMemberForm,
 };

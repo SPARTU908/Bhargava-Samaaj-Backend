@@ -76,10 +76,16 @@ const memberSchema = new mongoose.Schema(
         "डुप्लिकेट परिचय शुल्क - ₹50 रुपये",
       ],
     },
-    uploadForm: {
-      type: String,
-    },
+  
     isFormApproved: { type: Boolean, default: false },
+
+  isDispatched: {
+    type: Boolean,
+    default: false,
+  },
+  dispatchedAt: {
+    type: Date,
+  },
   },
   { timestamps: true }
 );
