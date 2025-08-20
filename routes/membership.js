@@ -1,5 +1,5 @@
 const express = require('express');
-const {createMember,uploadFormFile,loginMember,getMemberStatus,updateMemberStatus} = require('../controllers/membership');
+const {createMember,uploadFormFile,loginMember,getMemberStatus,updateMemberStatus,dispatchMemberForm} = require('../controllers/membership');
 const {getAllMembers} = require("../controllers/membership");
  const {getMemberCount} = require("../controllers/membership");
 const { protect } = require('../middleware/authMiddleware');
@@ -24,6 +24,7 @@ router.get("/count",getMemberCount);
 router.get("/:id/status", getMemberStatus);
 router.patch("/members/:id/status", updateMemberStatus);
 router.get('/allmember', protect(['superadmin', 'membershipadmin']), getAllMembers);
+router.put("/dispatch/:id", dispatchMemberForm);
 
 
 module.exports=router;
