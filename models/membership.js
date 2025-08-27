@@ -28,6 +28,12 @@ const memberSchema = new mongoose.Schema(
     spouseSignature: {
       type: String,
     },
+    uploadAadharUser: {
+      type: String,
+    },
+    uploadAadharSpouse: {
+      type: String,
+    },
     fatherName: {
       type: String,
       required: true,

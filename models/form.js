@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const userFormSchema = new mongoose.Schema({
-  number: Number,
+  number: String,
   name: String,
   email: String,
   mobile: Number,
@@ -9,7 +9,7 @@ const userFormSchema = new mongoose.Schema({
   birthTime: String,
   birthPlace: String,
   height: String,
-  weight: Number,
+  weight: String,
   dob: Date,
   bloodGroup: String,
   manglik: String,
@@ -27,7 +27,7 @@ const userFormSchema = new mongoose.Schema({
   guardianName: String,
   fatherName: String,
   fatherProfession: String,
-  fatherIncome: Number,
+  fatherIncome: String,
   // fatherOccupation: String,
   fatherDesignation: String,
   motherName: String,
