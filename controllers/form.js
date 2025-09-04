@@ -113,6 +113,29 @@ const getPendingFormCount = async (req, res) => {
   }
 };
 
+const getRejectedFormCount = async (req,res) =>{
+  try{
+    
+    const count = await UserForm.countDocuments({status:"rejected"});
+   
+    res.status(200).json({count});
+    
+  } catch (error) {
+    console.error('Error fetching pending form count:',error);
+    res.status(500).json({error:"Failed to fetch count"});
+  }
+}
+
+const getRejectedForms = async (req, res) => {
+  try {
+    const rejectedForms = await UserForm.find({ status: "rejected" });
+    res.status(200).json({ data: rejectedForms }); // Return array under `data`
+  } catch (error) {
+    console.error("Error fetching rejected forms:", error);
+    res.status(500).json({ error: "Failed to fetch rejected forms" });
+  }
+};
+
 const getFormCount = async (req, res) => {
   try {
     const count = await UserForm.countDocuments({ status: "approved" });
@@ -131,4 +154,6 @@ module.exports = {
   getUserStatus,
   getPendingFormCount,
   getFormCount,
+  getRejectedFormCount,
+  getRejectedForms,
 };

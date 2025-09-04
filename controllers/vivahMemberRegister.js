@@ -106,77 +106,6 @@ const loginMember = async (req, res) => {
   }
 };
 
-// const loginMember = async (req, res) => {
-//   try {
-//     console.log("🔵 Login API called");
-
-//     const { email: rawEmail, password: rawPassword } = req.body;
-//     console.log("🔵 Raw input:", rawEmail, rawPassword);
-
-//     const email = rawEmail?.trim();
-//     const password = rawPassword?.trim();
-
-//     if (!email || !password) {
-//       console.log("🔴 Missing email or password");
-//       return res.status(400).json({ error: "Email and password are required" });
-//     }
-
-//     const user = await VivahMember.findOne({ email });
-//     console.log("🔵 Found user:", user?.email);
-
-//     if (!user) {
-//       console.log("🔴 User not found");
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     console.log(`Entered password: [${password}]`);
-//     console.log(`Stored password: [${user.password}]`);
-
-//     if (user.password.trim() !== password) {
-//       console.log("🔴 Invalid credentials");
-//       return res.status(401).json({ error: "Invalid credentials" });
-//     }
-
-//     if (user.status === "rejected") {
-//       console.log("🔴 Account rejected");
-//       return res.status(403).json({
-//         error: "Your account has been rejected. Please contact support.",
-//       });
-//     }
-
-//     if (user.status !== "approved") {
-//       console.log("🔴 Account not approved");
-//       return res.status(403).json({
-//         error: "Your account is not approved yet. Please wait for approval.",
-//       });
-//     }
-
-//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-//       expiresIn: "1h",
-//     });
-
-//     console.log("✅ Login successful");
-//     return res.status(200).json({
-//       success: true,
-//       message: "Login successful",
-//       token,
-//       user: {
-//         id: user._id,
-//         email: user.email,
-//         name: user.name,
-//         status: user.status,
-//       },
-//     });
-
-//   } catch (error) {
-//     console.error("🔴 Server error:", error.message);
-//     return res.status(500).json({
-//       error: "Server error",
-//       details: error.message,
-//     });
-//   }
-// };
-
 
 const getPendingMembers = async (req, res) => {
   try {
@@ -195,44 +124,6 @@ const getPendingMembers = async (req, res) => {
     });
   }
 };
-
-// Approve or reject a Vivah Member by ID
-// const reviewVivahMember = async (req, res) => {
-//   try {
-//     const { memberId, action } = req.body;
-
-//     if (!["approve", "reject"].includes(action)) {
-//       return res.status(400).json({ error: "Invalid action" });
-//     }
-
-//     const user = await VivahMember.findById(memberId);
-//     if (!user) {
-//       return res.status(404).json({ error: "Member not found" });
-//     }
-
-//     // 🔁 Toggle logic
-//     let newStatus = "pending";
-//     if (action === "approve") {
-//       newStatus = user.status === "approved" ? "pending" : "approved";
-//     } else if (action === "reject") {
-//       newStatus = user.status === "rejected" ? "pending" : "rejected";
-//     }
-
-//     user.status = newStatus;
-//     await user.save();
-
-//     return res.status(200).json({
-//       success: true,
-//       message: `Member status updated to ${newStatus}`,
-//       member: user,
-//     });
-//   } catch (err) {
-//     return res.status(500).json({
-//       error: "Server error",
-//       details: err.message,
-//     });
-//   }
-// };
 
 const reviewVivahMember = async (req, res) => {
   try {
@@ -299,17 +190,69 @@ const reviewVivahMember = async (req, res) => {
 };
 
 
+// const resetPassword = async (req, res) => {
+//   try {
+//     const { email, newPassword } = req.body;
 
-module.exports = {
-  registerMember,
-  loginMember,
-  getPendingMembers,
-  reviewVivahMember,
+//     if (!email || !newPassword) {
+//       return res.status(400).json({ error: "Email and new password are required." });
+//     }
+
+//     const user = await VivahMember.findOne({ email });
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+   
+//     user.password = newPassword;
+//     user.confirmpassword = newPassword;
+
+//     await user.save();
+
+//     res.status(200).json({ message: "Password reset successful" });
+//   } catch (error) {
+//     console.error("Reset Password Error:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    console.log("Reset request:", { email });
+
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: "Email and new password are required." });
+    }
+
+    const user = await VivahMember.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      console.log("User not found for email:", email);
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.password = newPassword;
+    user.confirmpassword = newPassword;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
+
+
+
 module.exports = {
   registerMember,
   loginMember,
   getPendingMembers,
   reviewVivahMember,
+  resetPassword ,
 };

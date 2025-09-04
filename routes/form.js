@@ -4,7 +4,7 @@ const {
   getApprovedFormData,
   getPendingFormData,
   reviewForm,
-  getUserStatus,getPendingFormCount,getFormCount,
+  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
 
@@ -18,6 +18,8 @@ router.get('/status/:email', getUserStatus);
 router.get('/approved', protect(['superadmin', 'matrimonialadmin']), getApprovedFormData);
 router.get('/admin/pending', protect(['superadmin', 'matrimonialadmin']),  getPendingFormData);
 router.get("/pending/count", getPendingFormCount);
+router.get("/reject/count",getRejectedFormCount);
+router.get("/rejected", getRejectedForms);
 router.get("/approved/count",getFormCount);
 
 module.exports = router;
