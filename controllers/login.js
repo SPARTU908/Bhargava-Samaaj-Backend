@@ -4,9 +4,7 @@ const bcrypt = require("bcryptjs");
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email);
     const user = await UserForm.findOne({ email });
-    console.log(user);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -28,7 +26,9 @@ const resetPassword = async (req, res) => {
     const { email, newPassword } = req.body;
 
     if (!email || !newPassword) {
-      return res.status(400).json({ error: "Email and new password are required." });
+      return res
+        .status(400)
+        .json({ error: "Email and new password are required." });
     }
 
     const user = await UserForm.findOne({ email });
@@ -37,7 +37,6 @@ const resetPassword = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-   
     user.password = newPassword;
 
     await user.save();
@@ -49,8 +48,29 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getUserByEmail = async (req, res) => {
+  try {
+    const { email } = req.params;
 
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const user = await UserForm.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user by email:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 module.exports = {
-  loginUser,resetPassword
+  loginUser,
+  resetPassword,
+  getUserByEmail
 };

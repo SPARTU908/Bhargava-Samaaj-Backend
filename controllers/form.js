@@ -14,6 +14,8 @@ const saveFormData = async (req, res) => {
   }
 };
 
+
+
 const getApprovedFormData = async (req, res) => {
   try {
     const forms = await UserForm.find({ status: "approved" });
@@ -113,6 +115,7 @@ const getPendingFormCount = async (req, res) => {
   }
 };
 
+
 const getRejectedFormCount = async (req,res) =>{
   try{
     
@@ -146,6 +149,54 @@ const getFormCount = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const { email } = req.params; 
+    const deletedUser = await UserForm.findOneAndDelete({ email });
+     if (!deletedUser) {
+      return res.status(404).json({ error: "User not found" });
+    } res.status(200).json({
+      message: "User deleted successfully",
+      deletedUser,
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+};
+
+const updateUserDetails = async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const updateUser = await UserForm.findOneAndUpdate(
+      { email },
+      req.body, // This contains fields to update
+      {
+        new: true,         // Return updated document
+        runValidators: true, // Optional: ensures data is valid
+      }
+    );
+
+    if (!updateUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User details updated successfully",
+      updateUser,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Failed to update details of user" });
+  }
+};
+
+
+
+
+
+
 module.exports = {
   saveFormData,
   getApprovedFormData,
@@ -156,4 +207,6 @@ module.exports = {
   getFormCount,
   getRejectedFormCount,
   getRejectedForms,
+  deleteUser,
+  updateUserDetails,
 };

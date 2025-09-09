@@ -4,7 +4,7 @@ const {
   getApprovedFormData,
   getPendingFormData,
   reviewForm,
-  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms
+  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,deleteUser,updateUserDetails
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
 
@@ -21,5 +21,7 @@ router.get("/pending/count", getPendingFormCount);
 router.get("/reject/count",getRejectedFormCount);
 router.get("/rejected", getRejectedForms);
 router.get("/approved/count",getFormCount);
+router.delete('/deleteUser/:email', deleteUser);
+router.patch('/update/:email',updateUserDetails);
 
 module.exports = router;
