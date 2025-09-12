@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
+
 const rateLimit = require('express-rate-limit');
 const { v2: cloudinary } = require("cloudinary");
 require("dotenv").config();
@@ -13,6 +14,7 @@ const memberRoute = require("./routes/membership");
 const paymentRoute = require("./routes/payment");
 const authRoute = require("./routes/auth");
 const vivahRoute = require("./routes/vivahMemberRegister");
+const registerUserRoute = require("./routes/registeredUser");
 
 const app = express();
 
@@ -88,6 +90,8 @@ mongoose
 
 // ✅ Routes
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(limiter);
 app.use("/api/v1/form", formRoute);
 app.use("/api/v1", loginRoute);
@@ -96,35 +100,12 @@ app.use("/api/v1/payment", paymentRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/seed", seedRoutes);
 app.use("/api/v1", vivahRoute);
+app.use("/api/v1/register",registerUserRoute);
 
 
-// ✅ File Upload Route
-// app.post("/upload", upload.single("file"), async (req, res) => {
-//   try {
-//     const filePath = req.file.path;
-//     const fileType = path.extname(req.file.originalname).toLowerCase();
-//     const resourceType = fileType === ".pdf" ? "raw" : "image";
 
-//     const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {
-//       folder: "uploads",
-//       resource_type: resourceType,
-//     });
 
-//     const savedToDb = await File.create({
-//       filename: req.file.originalname,
-//       public_id: cloudinaryResponse.public_id,
-//       imgUrl: cloudinaryResponse.secure_url,
-//     });
 
-//     res.status(200).json({
-//       message: "File uploaded successfully",
-//       url: cloudinaryResponse.secure_url,
-//     });
-//   } catch (error) {
-//     console.error("Upload error:", error);
-//     res.status(500).json({ error: "File upload failed" });
-//   }
-// });
 
 app.get("/", (req, res) => {
   res.send("Backend is working 🚀");
