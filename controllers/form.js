@@ -207,6 +207,6 @@ module.exports = {
   getFormCount,
   getRejectedFormCount,
   getRejectedForms,
-  deleteUser,
+
   updateUserDetails,
 };

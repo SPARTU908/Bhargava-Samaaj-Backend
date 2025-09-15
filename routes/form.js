@@ -4,7 +4,7 @@ const {
   getApprovedFormData,
   getPendingFormData,
   reviewForm,
-  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,deleteUser,updateUserDetails
+  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
 
