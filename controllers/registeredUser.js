@@ -16,8 +16,8 @@ const register = async (req, res) => {
       category,
     } = req.body;
 
-    const paymentSlip = req.files?.paymentSlip?.[0]?.filename;
-    const photo = req.files?.photo?.[0]?.filename;
+    const paymentSlip = req.files?.paymentSlip?.[0]?.path;
+    const photo = req.files?.photo?.[0]?.path;
 
     const newForm = new RegisteredUser({
       abbsMembershipNo,

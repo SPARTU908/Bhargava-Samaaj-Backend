@@ -12,7 +12,7 @@ router.get('/seed-admins', async (req, res) => {
     const superAdminPass = await bcrypt.hash('Super@123', 10);
     const membershipAdminPass = await bcrypt.hash('Membership@456', 10);
     const matrimonialAdminPass = await bcrypt.hash('Matrimonial@789', 10);
-    const conferenceAdminPass = await bcrypt.hash('Conference@321', 10);  // NEW
+    const conferenceAdminPass = await bcrypt.hash('Conference@321', 10);  
 
     // Define admin users
     const users = [

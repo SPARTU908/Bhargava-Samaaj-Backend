@@ -1,0 +1,85 @@
+const mongoose = require('mongoose');
+
+const awardForm = new mongoose.Schema({
+    code1:{
+        type:String,
+        unique:true
+    },
+    code2:{
+        type:String,
+        unique:true
+    },
+    code3:{
+        type:String,
+        unique:true
+    },
+    name:{
+        type:String,
+        required:true
+    },
+    dob:{
+        type:Date,
+        required:true
+    },
+    mobile:{
+        type:String,
+        required:true
+    },
+    email:{
+        type:String,
+        required:true
+    },
+    pin:{
+        type:String,
+        required:true
+    },
+    academicQualification:{
+        type:String,
+        required:true
+    },
+    occupation:{
+        type:String,
+        required:true
+    },
+    father:{
+        type:String,
+        required:true
+    },
+    mother:{
+        type:String,
+        required:true
+    },
+    spouse:{
+        type:String,
+        required:true,
+
+    },
+    photo:{
+        type:String,
+        required:true
+    },
+    document1:{
+        type:String,
+        required:true
+    },
+    document2:{
+        type:String,
+        required:true
+    },
+    proposerName:{
+        type:String,
+    },
+    proposerEmail:{
+        type:String,
+    },
+    proposerMobile:{
+        type:String
+    },
+    proposerAddress:{
+        type:String
+    },
+
+},{ timestamps: true });
+
+module.exports = mongoose.model('AwardForm', awardForm);
+
