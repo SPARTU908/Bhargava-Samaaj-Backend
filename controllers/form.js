@@ -2,33 +2,86 @@ const UserForm = require("../models/form.js");
 const sendEmail = require("../mailsend.js");
 
 
+// const saveFormData = async (req, res) => {
+//   try {
+//     const email = req.body.email;
+//     const existingForm = await UserForm.findOne({ email });
+
+//     if (existingForm) {
+//       return res.status(409).json({
+//         errorMessage: "A form with this email already exists.",
+//       });
+//     }
+
+//     const photoPath = req.files?.photo?.[0]?.path.replace(/\\/g, "/") || "";
+//     const bioDataPath = req.files?.bioData?.[0]?.path.replace(/\\/g, "/") || "";
+
+//     const formData = {
+//       ...req.body,
+//       photo: photoPath,
+//       bioData: bioDataPath,
+//     };
+
+  
+//     const newForm = new UserForm(formData);
+//     await newForm.save();
+
+//     res.status(201).json({
+//       message: "Form data saved successfully",
+//       status: "pending",
+//     });
+
+//   } catch (error) {
+//     console.error("Error saving form data:", error);
+//     res.status(500).json({ errorMessage: "Something went wrong" });
+//   }
+// };
+
+
 const saveFormData = async (req, res) => {
   try {
     const email = req.body.email;
-    const existingForm = await UserForm.findOne({ email });
 
+    // Check for duplicate email
+    const existingForm = await UserForm.findOne({ email });
     if (existingForm) {
       return res.status(409).json({
         errorMessage: "A form with this email already exists.",
       });
     }
 
-    const photoPath = req.files?.photo?.[0]?.path.replace(/\\/g, "/") || "";
-    const bioDataPath = req.files?.bioData?.[0]?.path.replace(/\\/g, "/") || "";
+    // Base URL (http://localhost:3000 or https://yourdomain.com)
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
 
+    // Get uploaded file paths and convert to public URLs
+    const photoFile = req.files?.photo?.[0];
+    const bioDataFile = req.files?.bioData?.[0];
+
+    const photoUrl = photoFile
+      ? `${baseUrl}/${photoFile.path.replace(/\\/g, '/')}`
+      : "";
+
+    const bioDataUrl = bioDataFile
+      ? `${baseUrl}/${bioDataFile.path.replace(/\\/g, '/')}`
+      : "";
+
+    // Prepare the form data
     const formData = {
       ...req.body,
-      photo: photoPath,
-      bioData: bioDataPath,
+      photo: photoUrl,
+      bioData: bioDataUrl,
     };
 
-  
+    // Save to MongoDB
     const newForm = new UserForm(formData);
     await newForm.save();
 
+    // Success response
     res.status(201).json({
       message: "Form data saved successfully",
       status: "pending",
+      photo: photoUrl,
+      bioData: bioDataUrl,
     });
 
   } catch (error) {
@@ -36,6 +89,9 @@ const saveFormData = async (req, res) => {
     res.status(500).json({ errorMessage: "Something went wrong" });
   }
 };
+
+
+
 
 const getApprovedFormData = async (req, res) => {
   try {
