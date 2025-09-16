@@ -15,6 +15,7 @@ phone:{
 },
 membershipno:{
     type:String,
+    required:true
 },
 gender:{
     type:String,
@@ -41,11 +42,6 @@ confirmpassword:{
     type:String,
     required:true,
 },
-status: {
-    type: String,
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending'
-  },
 
 
 },{ timestamps: true });

@@ -32,9 +32,9 @@ router.get('/seed-admins', async (req, res) => {
         role: 'matrimonialadmin',
       },
       {
-        email: 'conferenceadmin@mysite.com',  // NEW
-        password: conferenceAdminPass,        // NEW
-        role: 'conferenceadmin',              // NEW
+        email: 'conferenceadmin@mysite.com',  
+        password: conferenceAdminPass,       
+        role: 'conferenceadmin',            
       },
     ];
 

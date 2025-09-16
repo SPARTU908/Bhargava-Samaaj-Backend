@@ -1,20 +1,41 @@
 const UserForm = require("../models/form.js");
 const sendEmail = require("../mailsend.js");
 
+
 const saveFormData = async (req, res) => {
   try {
-    const newForm = new UserForm(req.body);
+    const email = req.body.email;
+    const existingForm = await UserForm.findOne({ email });
+
+    if (existingForm) {
+      return res.status(409).json({
+        errorMessage: "A form with this email already exists.",
+      });
+    }
+
+    const photoPath = req.files?.photo?.[0]?.path.replace(/\\/g, "/") || "";
+    const bioDataPath = req.files?.bioData?.[0]?.path.replace(/\\/g, "/") || "";
+
+    const formData = {
+      ...req.body,
+      photo: photoPath,
+      bioData: bioDataPath,
+    };
+
+  
+    const newForm = new UserForm(formData);
     await newForm.save();
-    res
-      .status(201)
-      .json({ message: "Form data saved successfully", status: "pending" });
+
+    res.status(201).json({
+      message: "Form data saved successfully",
+      status: "pending",
+    });
+
   } catch (error) {
     console.error("Error saving form data:", error);
-    res.status(500).json({ error: "Failed to save form data" });
+    res.status(500).json({ errorMessage: "Something went wrong" });
   }
 };
-
-
 
 const getApprovedFormData = async (req, res) => {
   try {
@@ -149,21 +170,21 @@ const getFormCount = async (req, res) => {
   }
 };
 
-// const deleteUser = async (req, res) => {
-//   try {
-//     const { email } = req.params; 
-//     const deletedUser = await UserForm.findOneAndDelete({ email });
-//      if (!deletedUser) {
-//       return res.status(404).json({ error: "User not found" });
-//     } res.status(200).json({
-//       message: "User deleted successfully",
-//       deletedUser,
-//     });
-//   } catch (error) {
-//     console.error("Error deleting user:", error);
-//     res.status(500).json({ error: "Failed to delete user" });
-//   }
-// };
+const deleteUser = async (req, res) => {
+  try {
+    const { email } = req.params; 
+    const deletedUser = await UserForm.findOneAndDelete({ email });
+     if (!deletedUser) {
+      return res.status(404).json({ error: "User not found" });
+    } res.status(200).json({
+      message: "User deleted successfully",
+      deletedUser,
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+};
 
 const updateUserDetails = async (req, res) => {
   try {
@@ -207,6 +228,6 @@ module.exports = {
   getFormCount,
   getRejectedFormCount,
   getRejectedForms,
-
+  deleteUser,
   updateUserDetails,
 };
