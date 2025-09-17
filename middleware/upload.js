@@ -81,38 +81,4 @@ module.exports = upload;
 
 
 
-// const AWS = require("aws-sdk");
-// const multer = require("multer");
-// const multerS3 = require("multer-s3");
-// const path = require("path");
 
-// // Function to choose folder
-// function getFolderByContext(context) {
-//   if (context === "registration") return "registration";
-//   if (context === "awardform") return "awardform";
-//   if (context === "matrimonial") return "matrimonial";
-//   return "others";
-// }
-
-// // DigitalOcean Spaces config
-// const s3 = new AWS.S3({
-//   endpoint: new AWS.Endpoint(process.env.DO_SPACES_ENDPOINT), // <-- Important
-//   accessKeyId: process.env.DO_SPACES_KEY,
-//   secretAccessKey: process.env.DO_SPACES_SECRET,
-// });
-
-// // Multer S3 storage
-// const storage = multerS3({
-//   s3,
-//   bucket: process.env.DO_SPACES_BUCKET,
-//   acl: "public-read",
-//   key: function (req, file, cb) {
-//     const folder = getFolderByContext(req.uploadContext || "others");
-//     const uniqueName =
-//       Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
-//     cb(null, `${folder}/${uniqueName}`);
-//   },
-// });
-
-// const upload = multer({ storage });
-// module.exports = upload;

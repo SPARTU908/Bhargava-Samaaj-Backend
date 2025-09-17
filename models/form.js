@@ -40,7 +40,6 @@ fatherDesignation: String,
   password: String,
   photo: String,
   bioData: String,
-
 status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
