@@ -16,7 +16,7 @@ const router = express.Router();
 router.post(
   '/submit',
   (req, res, next) => {
-    req.uploadContext = 'matrimonial'; // Needed for your multer destination
+    req.uploadContext = 'matrimonial'; 
     next();
   },
   upload.fields([

@@ -114,7 +114,7 @@ app.get("/", (req, res) => {
 });
 
 // ✅ 404 Fallback
-app.use("*", (req, res) => {
+app.use("/:path", (req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 

@@ -51,19 +51,14 @@ const saveFormData = async (req, res) => {
     }
 
     // Base URL (http://localhost:3000 or https://yourdomain.com)
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    // const baseUrl = `${req.protocol}://${req.get('host')}`;
 
     // Get uploaded file paths and convert to public URLs
     const photoFile = req.files?.photo?.[0];
     const bioDataFile = req.files?.bioData?.[0];
 
-    const photoUrl = photoFile
-      ? `${baseUrl}/${photoFile.path.replace(/\\/g, '/')}`
-      : "";
-
-    const bioDataUrl = bioDataFile
-      ? `${baseUrl}/${bioDataFile.path.replace(/\\/g, '/')}`
-      : "";
+   const photoUrl = photoFile ? photoFile.location : "";
+const bioDataUrl = bioDataFile ? bioDataFile.location : "";
 
     // Prepare the form data
     const formData = {
