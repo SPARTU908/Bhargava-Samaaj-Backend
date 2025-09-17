@@ -56,7 +56,7 @@ function getFolderByContext(context) {
 
 // DigitalOcean Spaces config (v2 SDK)
 const s3 = new AWS.S3({
-  endpoint: process.env.DO_SPACES_ENDPOINT, // e.g., https://blr1.digitaloceanspaces.com
+  endpoint: process.env.DO_SPACES_ENDPOINT, 
   accessKeyId: process.env.DO_SPACES_KEY,
   secretAccessKey: process.env.DO_SPACES_SECRET,
 });
