@@ -38,10 +38,52 @@
 
 // middleware/upload.js
 
-const AWS = require("aws-sdk"); // AWS SDK v2
+// const AWS = require("aws-sdk"); // AWS SDK v2
+// const multer = require("multer");
+// const multerS3 = require("multer-s3");
+// const path = require("path");
+
+// // Function to choose folder based on form type
+// function getFolderByContext(context) {
+//   if (context === "registration") return "registration";
+//   if (context === "awardform") return "awardform";
+//   if (context === "matrimonial") return "matrimonial";
+//   return "others";
+// }
+
+// // DigitalOcean Spaces config (v2 SDK)
+// const s3 = new AWS.S3({
+//   endpoint: process.env.DO_SPACES_ENDPOINT, 
+//   accessKeyId: process.env.DO_SPACES_KEY,
+//   secretAccessKey: process.env.DO_SPACES_SECRET,
+// });
+
+// // Multer S3 storage
+// const storage = multerS3({
+//   s3: s3,
+//   bucket: process.env.DO_SPACES_BUCKET, // your space name
+//   acl: "public-read", // so files can be accessed publicly
+//   key: function (req, file, cb) {
+//     const folder = getFolderByContext(req.uploadContext || "others");
+//     const uniqueName =
+//       Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
+//     cb(null, `${folder}/${uniqueName}`);
+//   },
+// });
+
+// // Multer upload
+// const upload = multer({ storage });
+
+// module.exports = upload;
+
+
+
+
+
 const multer = require("multer");
-const multerS3 = require("multer-s3");
 const path = require("path");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const multerS3 = require("multer-s3-v3"); // forked version that works with v3
 
 // Function to choose folder based on form type
 function getFolderByContext(context) {
@@ -51,18 +93,21 @@ function getFolderByContext(context) {
   return "others";
 }
 
-// DigitalOcean Spaces config (v2 SDK)
-const s3 = new AWS.S3({
-  endpoint: process.env.DO_SPACES_ENDPOINT, 
-  accessKeyId: process.env.DO_SPACES_KEY,
-  secretAccessKey: process.env.DO_SPACES_SECRET,
+// DigitalOcean Spaces config (AWS SDK v3 client)
+const s3 = new S3Client({
+  region: "us-east-1", // DO Spaces uses any region (usually nyc3, sgp1 etc.)
+  endpoint: process.env.DO_SPACES_ENDPOINT, // e.g. https://nyc3.digitaloceanspaces.com
+  credentials: {
+    accessKeyId: process.env.DO_SPACES_KEY,
+    secretAccessKey: process.env.DO_SPACES_SECRET,
+  },
 });
 
-// Multer S3 storage
+// Multer S3 storage (v3-compatible)
 const storage = multerS3({
   s3: s3,
   bucket: process.env.DO_SPACES_BUCKET, // your space name
-  acl: "public-read", // so files can be accessed publicly
+  acl: "public-read",
   key: function (req, file, cb) {
     const folder = getFolderByContext(req.uploadContext || "others");
     const uniqueName =
@@ -71,11 +116,8 @@ const storage = multerS3({
   },
 });
 
-// Multer upload
 const upload = multer({ storage });
 
 module.exports = upload;
-
-
 
 
