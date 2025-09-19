@@ -99,6 +99,7 @@ function getFolderByContext(context) {
 const s3 = new S3Client({
   region: process.env.DO_SPACES_REGION, 
   endpoint: process.env.DO_SPACES_ENDPOINT, 
+  forcePathStyle: false,
   credentials: {
     accessKeyId: process.env.DO_SPACES_KEY,
     secretAccessKey: process.env.DO_SPACES_SECRET,
