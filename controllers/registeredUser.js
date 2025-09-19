@@ -16,8 +16,8 @@ const register = async (req, res) => {
       category,
     } = req.body;
 
-    const paymentSlip = req.files?.paymentSlip?.[0]?.path;
-    const photo = req.files?.photo?.[0]?.path;
+    const paymentSlip = req.files?.paymentSlip?.[0]?.location;
+    const photo = req.files?.photo?.[0]?.location;
 
     const newForm = new RegisteredUser({
       abbsMembershipNo,
@@ -39,7 +39,7 @@ const register = async (req, res) => {
     await sendEmail({
       to: email,
       subject: "Registration Successful - ABBS Conference",
-      text: `Hello ${name}, your registration for the 133rd Annual ABBS Conference has been received.`,
+      text: `Hello ${name}, your registration for the 134rd Annual ABBS Conference has been received.`,
       html: `
         <p>Dear <strong>${name}</strong>,</p>
         <p>Thank you for registering for the <strong>133<sup>rd</sup> Annual ABBS Conference</strong> to be held at <strong>Ujjain</strong> on <strong>20th, 21st, and 22nd December</strong>.</p>
@@ -74,5 +74,3 @@ module.exports = {
   register,
   getAllUsers,
 };
-
-module.exports = { register, getAllUsers };

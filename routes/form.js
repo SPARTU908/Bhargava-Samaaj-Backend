@@ -37,6 +37,21 @@ router.get("/reject/count",getRejectedFormCount);
 router.get("/rejected", getRejectedForms);
 router.get("/approved/count",getFormCount);
 router.delete('/deleteUser/:email', deleteUser);
-router.patch('/update/:email',updateUserDetails);
+// router.patch('/update/:email',updateUserDetails);
+
+const setProfileContext = (req, res, next) => {
+  req.uploadContext = 'matrimonial'; // or some relevant folder, maybe "profile" or "membership"
+  next();
+};
+
+router.patch(
+  '/update/:email',
+  setProfileContext,
+  upload.fields([
+    { name: 'photo', maxCount: 1 },
+    { name: 'bioData', maxCount: 1 }
+  ]),
+  updateUserDetails
+);
 
 module.exports = router;

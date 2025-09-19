@@ -2,72 +2,28 @@ const UserForm = require("../models/form.js");
 const sendEmail = require("../mailsend.js");
 
 
-// const saveFormData = async (req, res) => {
-//   try {
-//     const email = req.body.email;
-//     const existingForm = await UserForm.findOne({ email });
-
-//     if (existingForm) {
-//       return res.status(409).json({
-//         errorMessage: "A form with this email already exists.",
-//       });
-//     }
-
-//     const photoPath = req.files?.photo?.[0]?.path.replace(/\\/g, "/") || "";
-//     const bioDataPath = req.files?.bioData?.[0]?.path.replace(/\\/g, "/") || "";
-
-//     const formData = {
-//       ...req.body,
-//       photo: photoPath,
-//       bioData: bioDataPath,
-//     };
-
-  
-//     const newForm = new UserForm(formData);
-//     await newForm.save();
-
-//     res.status(201).json({
-//       message: "Form data saved successfully",
-//       status: "pending",
-//     });
-
-//   } catch (error) {
-//     console.error("Error saving form data:", error);
-//     res.status(500).json({ errorMessage: "Something went wrong" });
-//   }
-// };
-
-
 const saveFormData = async (req, res) => {
   try {
     const email = req.body.email;
-
-    // Check for duplicate email
-    const existingForm = await UserForm.findOne({ email });
+ const existingForm = await UserForm.findOne({ email });
     if (existingForm) {
       return res.status(409).json({
         errorMessage: "A form with this email already exists.",
       });
     }
-
-    // Base URL (http://localhost:3000 or https://yourdomain.com)
-    // const baseUrl = `${req.protocol}://${req.get('host')}`;
-
-    // Get uploaded file paths and convert to public URLs
-    const photoFile = req.files?.photo?.[0];
+const photoFile = req.files?.photo?.[0];
     const bioDataFile = req.files?.bioData?.[0];
 
    const photoUrl = photoFile ? photoFile.location : "";
 const bioDataUrl = bioDataFile ? bioDataFile.location : "";
 
-    // Prepare the form data
+
     const formData = {
       ...req.body,
       photo: photoUrl,
       bioData: bioDataUrl,
     };
 
-    // Save to MongoDB
     const newForm = new UserForm(formData);
     await newForm.save();
 
@@ -237,35 +193,74 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// const updateUserDetails = async (req, res) => {
+//   try {
+//     const { email } = req.params;
+
+//     const updateUser = await UserForm.findOneAndUpdate(
+//       { email },
+//       req.body, 
+//       {
+//         new: true,        
+//         runValidators: true, 
+//       }
+//     );
+
+//     if (!updateUser) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     res.status(200).json({
+//       message: "User details updated successfully",
+//       updateUser,
+//     });
+//   } catch (error) {
+//     console.error("Error updating user:", error);
+//     res.status(500).json({ error: "Failed to update details of user" });
+//   }
+// };
+
+
 const updateUserDetails = async (req, res) => {
   try {
     const { email } = req.params;
 
-    const updateUser = await UserForm.findOneAndUpdate(
+
+    const updateData = { ...req.body };  // this has all text fields
+
+    // If files were uploaded, get their locations (URLs on DO Spaces)
+    if (req.files) {
+      if (req.files.photo && req.files.photo[0]) {
+        // multer‑s3 v3 gives something like file.location
+        updateData.photo = req.files.photo[0].location;
+      }
+      if (req.files.bioData && req.files.bioData[0]) {
+        updateData.bioData = req.files.bioData[0].location;
+      }
+    }
+
+    const updatedUser = await UserForm.findOneAndUpdate(
       { email },
-      req.body, // This contains fields to update
+      updateData,
       {
-        new: true,         // Return updated document
-        runValidators: true, // Optional: ensures data is valid
+        new: true,
+        runValidators: true,
       }
     );
 
-    if (!updateUser) {
+    if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
 
     res.status(200).json({
       message: "User details updated successfully",
-      updateUser,
+      updatedUser,
     });
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ error: "Failed to update details of user" });
   }
 };
-
-
-
 
 
 

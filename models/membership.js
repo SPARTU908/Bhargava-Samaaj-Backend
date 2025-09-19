@@ -19,11 +19,13 @@ const memberSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      required: true,
+      required:true,
+     
     },
     signature: {
       type: String,
-      required: true,
+      required:true
+     
     },
     spouseSignature: {
       type: String,
@@ -83,7 +85,7 @@ const memberSchema = new mongoose.Schema(
       ],
     },
   
-    isFormApproved: { type: Boolean, default: false },
+   
 
   isDispatched: {
     type: Boolean,

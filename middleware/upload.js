@@ -83,20 +83,22 @@
 const multer = require("multer");
 const path = require("path");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const multerS3 = require("multer-s3-v3"); // forked version that works with v3
+const multerS3 = require("multer-s3-v3"); 
 
-// Function to choose folder based on form type
+
 function getFolderByContext(context) {
   if (context === "registration") return "registration";
   if (context === "awardform") return "awardform";
   if (context === "matrimonial") return "matrimonial";
+  if (context === "membership") return "membership"; 
+
   return "others";
 }
 
-// DigitalOcean Spaces config (AWS SDK v3 client)
+
 const s3 = new S3Client({
-  region: "us-east-1", // DO Spaces uses any region (usually nyc3, sgp1 etc.)
-  endpoint: process.env.DO_SPACES_ENDPOINT, // e.g. https://nyc3.digitaloceanspaces.com
+  region: "auto", // DO Spaces uses any region (usually nyc3, sgp1 etc.)
+  endpoint: process.env.DO_SPACES_ENDPOINT, 
   credentials: {
     accessKeyId: process.env.DO_SPACES_KEY,
     secretAccessKey: process.env.DO_SPACES_SECRET,

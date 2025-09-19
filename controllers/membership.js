@@ -12,7 +12,7 @@ const createMember = async (req, res) => {
 
     res.status(201).json({
       message: "Member created successfully",
-      memberId: member._id, // So frontend can use this to upload file later
+      memberId: member._id, 
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -246,6 +246,47 @@ const dispatchMemberForm = async (req, res) => {
   }
 };
 
+
+
+const uploadFormFileMulti = async (req, res) => {
+  try {
+    const memberId = req.params.id;
+
+    if (!req.files || !req.files.photo || !req.files.signature || !req.files.uploadAadharUser) {
+      return res.status(400).json({ error: "Photo, signature and Aadhar card files are required." });
+    }
+
+    // Files URLs from multer-s3 will be in req.files.<fieldname>[0].location
+    const photoUrl = req.files.photo[0].location;
+    const signatureUrl = req.files.signature[0].location;
+    const aadharUrl = req.files.uploadAadharUser[0].location;
+
+    // Update member with all three URLs
+    const updatedMember = await Member.findByIdAndUpdate(
+      memberId,
+      {
+        photo: photoUrl,
+        signature: signatureUrl,
+        uploadAadharUser: aadharUrl,
+      },
+      { new: true }
+    );
+
+    if (!updatedMember) {
+      return res.status(404).json({ error: "Member not found" });
+    }
+
+    res.status(200).json({
+      message: "Files uploaded and member updated successfully",
+      member: updatedMember,
+    });
+  } catch (error) {
+    console.error("Upload failed:", error);
+    res.status(500).json({ error: "Upload failed", details: error.message });
+  }
+};
+
+
 module.exports = {
   createMember,
   getAllMembers,
@@ -255,4 +296,5 @@ module.exports = {
   getMemberStatus,
   updateMemberStatus,
   dispatchMemberForm,
+  uploadFormFileMulti,
 };
