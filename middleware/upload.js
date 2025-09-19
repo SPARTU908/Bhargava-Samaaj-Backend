@@ -96,6 +96,10 @@ function getFolderByContext(context) {
 }
 
 
+console.log("DO_SPACES_REGION:", process.env.DO_SPACES_REGION);
+console.log("DO_SPACES_ENDPOINT:", process.env.DO_SPACES_ENDPOINT);
+console.log("DO_SPACES_BUCKET:", process.env.DO_SPACES_BUCKET);
+
 const s3 = new S3Client({
   region: process.env.DO_SPACES_REGION, 
   endpoint: process.env.DO_SPACES_ENDPOINT, 
