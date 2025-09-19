@@ -97,7 +97,7 @@ function getFolderByContext(context) {
 
 
 const s3 = new S3Client({
-  region: "auto", // DO Spaces uses any region (usually nyc3, sgp1 etc.)
+  region: process.env.DO_SPACES_REGION, 
   endpoint: process.env.DO_SPACES_ENDPOINT, 
   credentials: {
     accessKeyId: process.env.DO_SPACES_KEY,
