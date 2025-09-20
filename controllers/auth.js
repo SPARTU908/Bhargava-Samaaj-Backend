@@ -16,7 +16,6 @@ const login = async (req, res) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    // Check if selected role matches the actual role
     if (user.role !== role) {
       return res.status(403).json({ error: `Access denied for role '${role}'` });
     }

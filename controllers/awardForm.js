@@ -4,7 +4,7 @@ const registerAwardForm = async (req, res) => {
   try {
     const {
       code1, code2, code3,
-      name, dob, mobile, email, pin,
+      name, dob, mobile, email, address, pin,
       academicQualification, occupation,
       father, mother, spouse,
       proposerName, proposerEmail, proposerMobile, proposerAddress
@@ -22,7 +22,7 @@ const registerAwardForm = async (req, res) => {
 
     const newForm = new AwardForm({
       code1, code2, code3,
-      name, dob, mobile, email, pin,
+      name, dob, mobile, email, address, pin,
       academicQualification, occupation,
       father, mother, spouse,
       photo, document1, document2,

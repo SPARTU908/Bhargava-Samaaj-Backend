@@ -42,7 +42,7 @@ const register = async (req, res) => {
       text: `Hello ${name}, your registration for the 134rd Annual ABBS Conference has been received.`,
       html: `
         <p>Dear <strong>${name}</strong>,</p>
-        <p>Thank you for registering for the <strong>133<sup>rd</sup> Annual ABBS Conference</strong> to be held at <strong>Ujjain</strong> on <strong>20th, 21st, and 22nd December</strong>.</p>
+        <p>Thank you for registering for the <strong>134<sup>rd</sup> Annual ABBS Conference</strong> to be held at <strong>Ujjain</strong> on <strong>20th, 21st, and 22nd December</strong>.</p>
         <p>We have received your registration details and payment slip.</p>
         <p>Please keep this email for your reference.</p>
         <br/>

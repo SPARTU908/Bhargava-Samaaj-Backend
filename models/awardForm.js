@@ -3,15 +3,14 @@ const mongoose = require('mongoose');
 const awardForm = new mongoose.Schema({
     code1:{
         type:String,
-        unique:true
+       required:true
     },
     code2:{
         type:String,
-        unique:true
-    },
+     },
     code3:{
         type:String,
-        unique:true
+        
     },
     name:{
         type:String,
@@ -29,6 +28,10 @@ const awardForm = new mongoose.Schema({
         type:String,
         required:true
     },
+    address:{
+        type:String,
+        required:true
+    },
     pin:{
         type:String,
         required:true
@@ -39,7 +42,7 @@ const awardForm = new mongoose.Schema({
     },
     occupation:{
         type:String,
-        required:true
+       
     },
     father:{
         type:String,
@@ -51,7 +54,7 @@ const awardForm = new mongoose.Schema({
     },
     spouse:{
         type:String,
-        required:true,
+       
 
     },
     photo:{
@@ -60,11 +63,11 @@ const awardForm = new mongoose.Schema({
     },
     document1:{
         type:String,
-        required:true
+       required:true
     },
     document2:{
         type:String,
-        required:true
+       
     },
     proposerName:{
         type:String,
