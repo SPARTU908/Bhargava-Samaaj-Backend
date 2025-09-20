@@ -16,8 +16,8 @@ const registerAwardForm = async (req, res) => {
     const document2 = req.files?.document2?.[0]?.location;
 
 
- if (!photo || !document1 || !document2) {
-      return res.status(400).json({ message: 'Photo and both documents are required.' });
+ if (!photo || !document1 ) {
+      return res.status(400).json({ message: 'Photo and Documents are required.' });
     }
 
     const newForm = new AwardForm({

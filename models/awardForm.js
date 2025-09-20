@@ -10,8 +10,7 @@ const awardForm = new mongoose.Schema({
      },
     code3:{
         type:String,
-        
-    },
+     },
     name:{
         type:String,
         required:true
@@ -54,9 +53,7 @@ const awardForm = new mongoose.Schema({
     },
     spouse:{
         type:String,
-       
-
-    },
+     },
     photo:{
         type:String,
         required:true
