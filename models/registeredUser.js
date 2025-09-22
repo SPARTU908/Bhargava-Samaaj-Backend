@@ -1,11 +1,10 @@
-
 const mongoose = require('mongoose');
 
 const registeredUser = new mongoose.Schema({
   abbsMembershipNo: {
     type: String,
     required: true,
-    unique: true
+  
   },
   name: {
     type: String,

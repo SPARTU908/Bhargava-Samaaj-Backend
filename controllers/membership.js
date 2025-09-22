@@ -5,6 +5,20 @@ const cloudinary = require("../utils/cloudinary");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../mailsend.js");
 
+// const createMember = async (req, res) => {
+//   try {
+//     const member = new Member(req.body);
+//     await member.save();
+
+//     res.status(201).json({
+//       message: "Member created successfully",
+//       memberId: member._id, 
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 const createMember = async (req, res) => {
   try {
     const member = new Member(req.body);
@@ -12,12 +26,20 @@ const createMember = async (req, res) => {
 
     res.status(201).json({
       message: "Member created successfully",
-      memberId: member._id, 
+      memberId: member._id,
     });
   } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: error.errors,
+      });
+    }
+
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const loginMember = async (req, res) => {
   try {
