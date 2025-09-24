@@ -3,9 +3,7 @@ const mongoose = require('mongoose');
 const registeredUser = new mongoose.Schema({
   abbsMembershipNo: {
     type: String,
-    required: true,
-  
-  },
+   },
   name: {
     type: String,
     required: true
