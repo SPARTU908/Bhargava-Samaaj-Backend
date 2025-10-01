@@ -1,76 +1,120 @@
 const RegisteredUser = require("../models/registeredUser");
-const sendEmail = require("../mailsend.js");
 
-const register = async (req, res) => {
+// const register = async (req, res) => {
+//   try {
+//     const {
+//       abbsMembershipNo,
+//       name,
+//       gender,
+//       dob,
+//       address,
+//       city,
+//       pincode,
+//       mobileNo,
+//       email,
+//       category,
+//     } = req.body;
+
+   
+//     const photo = req.files?.photo?.[0]?.location;
+
+//     const newForm = new RegisteredUser({
+//       abbsMembershipNo,
+//       name,
+//       gender,
+//       dob,
+//       address,
+//       city,
+//       pincode,
+//       mobileNo,
+//       email,
+//       category,
+     
+//       photo,
+//     });
+
+//     await newForm.save();
+
+   
+
+//     res
+//       .status(201)
+//       .json({ message: "Form submitted successfully", form: newForm });
+//   } catch (error) {
+//     console.error("Error submitting form:", error);
+//     res.status(500).json({ error: "Server Error" });
+//   }
+// };
+
+// const getAllUsers = async (req, res) => {
+//   try {
+//     const users = await RegisteredUser.find().sort({ createdAt: -1 });
+//     res.status(200).json({ users });
+//   } catch (error) {
+//     console.error("Error fetching users:", error);
+//     res.status(500).json({ error: "Failed to fetch users" });
+//   }
+// };
+
+
+const getUserByMembershipNo = async (req, res) => {
   try {
-    const {
-      abbsMembershipNo,
-      name,
-      gender,
-      dob,
-      address,
-      city,
-      pincode,
-      mobileNo,
-      email,
-      category,
-    } = req.body;
+    const { lifemembershipNo } = req.params;
+     console.log("Searching for:", lifemembershipNo);
 
-    const paymentSlip = req.files?.paymentSlip?.[0]?.location;
-    const photo = req.files?.photo?.[0]?.location;
+    const user = await RegisteredUser.findOne({ lifemembershipNo });
+    console.log("Found user:", user);
 
-    const newForm = new RegisteredUser({
-      abbsMembershipNo,
-      name,
-      gender,
-      dob,
-      address,
-      city,
-      pincode,
-      mobileNo,
-      email,
-      category,
-      paymentSlip,
-      photo,
-    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
-    await newForm.save();
-
-    await sendEmail({
-      to: email,
-      subject: "Registration Successful - ABBS Conference",
-      text: `Hello ${name}, your registration for the 134rd Annual ABBS Conference has been received.`,
-      html: `
-        <p>Dear <strong>${name}</strong>,</p>
-        <p>Thank you for registering for the <strong>134<sup>rd</sup> Annual ABBS Conference</strong> to be held at <strong>Ujjain</strong> on <strong>20th, 21st, and 22nd December</strong>.</p>
-        <p>We have received your registration details and payment slip.</p>
-        <p>Please keep this email for your reference.</p>
-        <br/>
-        <p>Warm regards,</p>
-        <p><strong>ABBS Conference Committee</strong></p>
-      `,
-    });
-
-    res
-      .status(201)
-      .json({ message: "Form submitted successfully", form: newForm });
+    res.status(200).json(user);
   } catch (error) {
-    console.error("Error submitting form:", error);
-    res.status(500).json({ error: "Server Error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-const getAllUsers = async (req, res) => {
+// 2. Update missing fields
+const updateMissingFields = async (req, res) => {
   try {
-    const users = await RegisteredUser.find().sort({ createdAt: -1 });
-    res.status(200).json({ users });
+    const { lifemembershipNo } = req.params;
+    const updates = req.body;
+
+    // Check if a new photo file is uploaded
+    const photoFile = req.files?.photo?.[0];
+    const photoUrl = photoFile ? photoFile.location : null; // DigitalOcean Spaces file URL
+
+    const user = await RegisteredUser.findOne({ lifemembershipNo });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Update only fields that are currently missing or empty
+    for (let key in updates) {
+      if (!user[key] || user[key] === "" || user[key] === null) {
+        user[key] = updates[key];
+      }
+    }
+
+    // If user.photo is missing and a photo file was uploaded, update it
+    if ((!user.photo || user.photo === "") && photoUrl) {
+      user.photo = photoUrl;
+    }
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({ message: "User updated successfully.", user: updatedUser });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ error: "Failed to fetch users" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 module.exports = {
-  register,
-  getAllUsers,
+  getUserByMembershipNo,
+  updateMissingFields,
 };
+
+

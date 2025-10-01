@@ -5,19 +5,6 @@ const cloudinary = require("../utils/cloudinary");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../mailsend.js");
 
-// const createMember = async (req, res) => {
-//   try {
-//     const member = new Member(req.body);
-//     await member.save();
-
-//     res.status(201).json({
-//       message: "Member created successfully",
-//       memberId: member._id, 
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 const createMember = async (req, res) => {
   try {
@@ -152,13 +139,15 @@ const getAllMembers = async (req, res) => {
 
 const getMemberCount = async (req, res) => {
   try {
-    const count = await Member.countDocuments(); // sabhi documents count honge
+    const count = await Member.countDocuments(); 
     res.status(200).json({ count });
   } catch (error) {
     console.log("Error fetching member count:", error);
     res.status(500).json({ error: "Failed to fetch count" });
   }
 };
+
+
 
 const updateMemberStatus = async (req, res) => {
   try {
@@ -220,7 +209,7 @@ const updateMemberStatus = async (req, res) => {
   }
 };
 
-// DISPATCH MEMBER FORM
+
 const dispatchMemberForm = async (req, res) => {
   try {
     const memberId = req.params.id;
@@ -230,14 +219,14 @@ const dispatchMemberForm = async (req, res) => {
       return res.status(404).json({ message: "Member not found" });
     }
 
-    // Prevent duplicate dispatch
+ 
     if (member.isDispatched) {
       return res
         .status(400)
         .json({ message: "This member is already dispatched" });
     }
 
-    // Send dispatch email
+
     await sendEmail({
       to: member.email,
       subject: "Membership Form Dispatched",
@@ -249,7 +238,7 @@ const dispatchMemberForm = async (req, res) => {
       `,
     });
 
-    // Update DB
+
     member.isDispatched = true;
     member.dispatchedAt = new Date();
     await member.save();
@@ -278,12 +267,12 @@ const uploadFormFileMulti = async (req, res) => {
       return res.status(400).json({ error: "Photo, signature and Aadhar card files are required." });
     }
 
-    // Files URLs from multer-s3 will be in req.files.<fieldname>[0].location
+ 
     const photoUrl = req.files.photo[0].location;
     const signatureUrl = req.files.signature[0].location;
     const aadharUrl = req.files.uploadAadharUser[0].location;
 
-    // Update member with all three URLs
+  
     const updatedMember = await Member.findByIdAndUpdate(
       memberId,
       {

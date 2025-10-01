@@ -14,7 +14,7 @@ const memberRoute = require("./routes/membership");
 const paymentRoute = require("./routes/payment");
 const authRoute = require("./routes/auth");
 const vivahRoute = require("./routes/vivahMemberRegister");
-const registerUserRoute = require("./routes/registeredUser");
+const registerUserRoute = require("./routes/lifememberregistration");
 const awardFormRoutes = require('./routes/awardForm');
 
 const app = express();

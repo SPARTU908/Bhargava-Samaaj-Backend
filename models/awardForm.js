@@ -54,6 +54,12 @@ const awardForm = new mongoose.Schema({
     spouse:{
         type:String,
      },
+     spousedob:{
+         type:Date,
+     },
+     spouseOccupation:{
+        type:String,
+     },
     photo:{
         type:String,
         required:true

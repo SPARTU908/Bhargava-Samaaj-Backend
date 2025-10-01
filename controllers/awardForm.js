@@ -6,7 +6,7 @@ const registerAwardForm = async (req, res) => {
       code1, code2, code3,
       name, dob, mobile, email, address, pin,
       academicQualification, occupation,
-      father, mother, spouse,
+      father, mother, spouse,spousedob, spouseOccupation,
       proposerName, proposerEmail, proposerMobile, proposerAddress
     } = req.body;
 
@@ -24,7 +24,7 @@ const registerAwardForm = async (req, res) => {
       code1, code2, code3,
       name, dob, mobile, email, address, pin,
       academicQualification, occupation,
-      father, mother, spouse,
+      father, mother, spouse, spouseOccupation,spousedob,
       photo, document1, document2,
       proposerName, proposerEmail, proposerMobile, proposerAddress
     });
