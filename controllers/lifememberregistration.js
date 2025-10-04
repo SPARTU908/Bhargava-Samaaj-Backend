@@ -1,6 +1,5 @@
 const LifeMember = require("../models/lifememberregistration");
 
-
 const searchLifeMember = async (req, res) => {
   try {
     const { lm_no } = req.params;
@@ -18,23 +17,19 @@ const searchLifeMember = async (req, res) => {
   }
 };
 
-
-
-
 const updateEmptyFields = async (req, res) => {
   try {
     const { lm_no } = req.params;
     const updates = req.body;
-    const photoFile = req.files?.photo?.[0]; 
+    const photoFile = req.files?.photo?.[0];
     const photoUrl = photoFile ? photoFile.location : null;
 
     const member = await LifeMember.findOne({ lm_no });
 
     if (!member) {
-      return res.status(404).json({ message: "Life member not found." });
+      return res.status(404).json({ message: " ABBS life member not found." });
     }
 
-   
     Object.keys(updates).forEach((key) => {
       const currentValue = member[key];
       if (
@@ -46,11 +41,12 @@ const updateEmptyFields = async (req, res) => {
       }
     });
 
-   
-    if ((!member.photo || member.photo === "") && photoUrl) {
+    // if ((!member.photo || member.photo === "") && photoUrl) {
+    //   member.photo = photoUrl;
+    // }
+    if (photoUrl) {
       member.photo = photoUrl;
     }
-
     await member.save();
 
     res.status(200).json({
@@ -59,16 +55,24 @@ const updateEmptyFields = async (req, res) => {
     });
   } catch (error) {
     console.error("Update error:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
-
-
-
+const getAllLifeMembers = async (req, res) => {
+  try {
+    const members = await LifeMember.find();
+    res.status(200).json(members);
+  } catch (error) {
+    console.error("Fetch all error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 module.exports = {
   searchLifeMember,
   updateEmptyFields,
- 
+  getAllLifeMembers,
 };

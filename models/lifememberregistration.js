@@ -5,6 +5,8 @@ const lifeMemberSchema = new mongoose.Schema(
     lm_no: {
       type: String,
       required: true,
+      unique:true,
+      index:true
     },
     year: {
       type: String,
