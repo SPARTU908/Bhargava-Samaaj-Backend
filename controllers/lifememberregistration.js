@@ -64,12 +64,17 @@ const updateEmptyFields = async (req, res) => {
 
 const updateLifeMember = async (req, res) => {
   const { lm_no } = req.params;
+  const updateData = { ...req.body };
+
+if (req.files && req.files.photo && req.files.photo[0]) {
+    updateData.photo = req.files.photo[0].location; // 'location' is the public URL from multer-s3
+  }
 
   try {
     const updatedMember = await LifeMember.findOneAndUpdate(
-      { lm_no: lm_no },      
-      req.body,               
-      { new: true, runValidators: true }  
+      { lm_no: lm_no },
+      updateData,
+      { new: true, runValidators: true }
     );
 
     if (!updatedMember) {
@@ -85,6 +90,7 @@ const updateLifeMember = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 const getAllLifeMembers = async (req, res) => {
   try {
