@@ -4,6 +4,7 @@ const {
   searchLifeMember,
   updateEmptyFields,
   getAllLifeMembers,
+  updateLifeMember,
 
 } = require("../controllers/lifememberregistration");
 
@@ -23,6 +24,8 @@ router.patch(
   upload.fields([{ name: "photo", maxCount: 1 }]),
   updateEmptyFields
 );
+router.patch("/life-members/:lm_no",setRegistrationContext,
+  upload.fields([{ name: "photo", maxCount: 1 }]), updateLifeMember);
 
 
 
