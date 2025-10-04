@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const {
   searchLifeMember,
-  updateEmptyFields,
+
   getAllLifeMembers,
   updateLifeMember,
+  getUpdatedLifeMembers,
 
 } = require("../controllers/lifememberregistration");
 
@@ -19,15 +20,10 @@ router.get("/lifemembers", getAllLifeMembers);
 
 router.get("/lifemember/:lm_no", searchLifeMember);
 
-router.patch(
-  "/lifemember/update/:lm_no", setRegistrationContext,
-  upload.fields([{ name: "photo", maxCount: 1 }]),
-  updateEmptyFields
-);
 router.patch("/life-members/:lm_no",setRegistrationContext,
   upload.fields([{ name: "photo", maxCount: 1 }]), updateLifeMember);
 
-
+router.get("/updated-members", getUpdatedLifeMembers);
 
 
 module.exports = router;

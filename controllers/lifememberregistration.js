@@ -17,49 +17,49 @@ const searchLifeMember = async (req, res) => {
   }
 };
 
-const updateEmptyFields = async (req, res) => {
-  try {
-    const { lm_no } = req.params;
-    const updates = req.body;
-    const photoFile = req.files?.photo?.[0];
-    const photoUrl = photoFile ? photoFile.location : null;
+// const updateEmptyFields = async (req, res) => {
+//   try {
+//     const { lm_no } = req.params;
+//     const updates = req.body;
+//     const photoFile = req.files?.photo?.[0];
+//     const photoUrl = photoFile ? photoFile.location : null;
 
-    const member = await LifeMember.findOne({ lm_no });
+//     const member = await LifeMember.findOne({ lm_no });
 
-    if (!member) {
-      return res.status(404).json({ message: " ABBS life member not found." });
-    }
+//     if (!member) {
+//       return res.status(404).json({ message: " ABBS life member not found." });
+//     }
 
-    Object.keys(updates).forEach((key) => {
-      const currentValue = member[key];
-      if (
-        currentValue === "" ||
-        currentValue === null ||
-        currentValue === undefined
-      ) {
-        member[key] = updates[key];
-      }
-    });
+//     Object.keys(updates).forEach((key) => {
+//       const currentValue = member[key];
+//       if (
+//         currentValue === "" ||
+//         currentValue === null ||
+//         currentValue === undefined
+//       ) {
+//         member[key] = updates[key];
+//       }
+//     });
 
-    // if ((!member.photo || member.photo === "") && photoUrl) {
-    //   member.photo = photoUrl;
-    // }
-    if (photoUrl) {
-      member.photo = photoUrl;
-    }
-    await member.save();
+//     // if ((!member.photo || member.photo === "") && photoUrl) {
+//     //   member.photo = photoUrl;
+//     // }
+//     if (photoUrl) {
+//       member.photo = photoUrl;
+//     }
+//     await member.save();
 
-    res.status(200).json({
-      message: "Fields updated successfully.",
-      updatedData: member,
-    });
-  } catch (error) {
-    console.error("Update error:", error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
-  }
-};
+//     res.status(200).json({
+//       message: "Fields updated successfully.",
+//       updatedData: member,
+//     });
+//   } catch (error) {
+//     console.error("Update error:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Internal server error", error: error.message });
+//   }
+// };
 
 
 const updateLifeMember = async (req, res) => {
@@ -102,9 +102,31 @@ const getAllLifeMembers = async (req, res) => {
   }
 };
 
+const getUpdatedLifeMembers = async (req, res) => {
+  try {
+    const updatedMembers = await LifeMember.find({
+      photo: { $nin: [null, ""] },
+      contact_no: { $nin: [null, ""] },
+      email: { $nin: [null, ""] },
+      address1: { $nin: [null, ""] },
+      city: { $nin: [null, ""] },
+      gotra: { $nin: [null, ""] },
+      kuldevi: { $nin: [null, ""] },
+      member_name: { $nin: [null, ""] },
+    });
+
+    res.status(200).json(updatedMembers);
+  } catch (error) {
+    console.error("Error fetching updated life members:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+
 module.exports = {
   searchLifeMember,
-  updateEmptyFields,
+  // updateEmptyFields,
   getAllLifeMembers,
-  updateLifeMember
+  updateLifeMember,
+  getUpdatedLifeMembers,
 };

@@ -5,7 +5,7 @@ const User = require('../models/user');
 
 router.get('/seed-admins', async (req, res) => {
   try {
-    // Delete existing admin users
+  
     await User.deleteMany({ role: { $in: ['superadmin', 'membershipadmin', 'matrimonialadmin', 'conferenceadmin'] } });
 
     // Hash passwords
