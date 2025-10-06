@@ -38,7 +38,7 @@ const lifeMemberSchema = new mongoose.Schema(
     },
     address_extra: {
       type: String,
-      required: true,
+      required:true,
     },
     city: {
       type: String,

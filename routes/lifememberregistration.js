@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   searchLifeMember,
-
+createLifeMember,
   getAllLifeMembers,
   updateLifeMember,
   getUpdatedLifeMembers,
@@ -19,7 +19,12 @@ const setRegistrationContext = (req, res, next) => {
 router.get("/lifemembers", getAllLifeMembers);
 
 router.get("/lifemember/:lm_no", searchLifeMember);
-
+router.post(
+  "/lifemember",
+  setRegistrationContext,
+  upload.fields([{ name: "photo", maxCount: 1 }]),
+  createLifeMember
+);
 router.patch("/life-members/:lm_no",setRegistrationContext,
   upload.fields([{ name: "photo", maxCount: 1 }]), updateLifeMember);
 
