@@ -8,7 +8,8 @@ function getFolderByContext(context) {
   if (context === "registration") return "registration";
   if (context === "awardform") return "awardform";
   if (context === "matrimonial") return "matrimonial";
-  if (context === "membership") return "membership"; 
+  if (context === "membership") return "membership";
+  if (context === "magazine") return "magazine";  
    return "others";
 }
 
