@@ -42,21 +42,15 @@ const registerMagazine = async (req, res) => {
   }
 };
 
-const getAllMagazines = async () => {
+const getAllMagazines = async (req, res) => {
   try {
-    console.log("Fetching all magazines from DB...");
-    const magazines = await Magazine.find(); 
- 
-    return {
-      success: true,
-      data: magazines,
-    };
+    const magazines = await Magazine.find().sort({ createdAt: -1 });
+    res.status(200).json({ magazines });
   } catch (error) {
-    console.error("Error fetching magazines:", error);
-    throw error;
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Failed to fetch magazine registration users" });
   }
 };
 
 
-
-module.exports = { registerMagazine,getAllMagazines};
+module.exports = { registerMagazine , getAllMagazines};
