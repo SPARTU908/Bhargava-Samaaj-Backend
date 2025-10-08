@@ -157,47 +157,52 @@ const getAllLifeMembers = async (req, res) => {
   }
 };
 
+// const getUpdatedLifeMembers = async (req, res) => {
+//   try {
+//     const updatedMembers = await LifeMember.find({
+//      lm_no: { $nin: [null, ""] },
+//       year: { $nin: [null, ""] },
+//       col_y: { $nin: [null, ""] },
+//       member_name: { $nin: [null, ""] },
+//       card_issue: { $nin: [null, ""] },
+//       add: { $nin: [null, ""] },
+//       dob: { $nin: [null, ""] },
+//       address1: { $nin: [null, ""] },
+//       address_extra: { $nin: [null, ""] },
+//       city: { $nin: [null, ""] },
+//       pin: { $nin: [null, ""] },
+//       contact_no: { $nin: [null, ""] },
+//       email: { $nin: [null, ""] },
+//       gotra: { $nin: [null, ""] },
+//       kuldevi: { $nin: [null, ""] },
+//       gender: { $nin: [null, ""] },
+//       category: { $nin: [null, ""] },
+//       photo: { $nin: [null, ""] },
+//     });
+
+//     res.status(200).json(updatedMembers);
+//   } catch (error) {
+//     console.error("Error fetching updated life members:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Internal server error", error: error.message });
+//   }
+// };
 const getUpdatedLifeMembers = async (req, res) => {
   try {
     const updatedMembers = await LifeMember.find({
-      // photo: { $nin: [null, ""] },
-      // contact_no: { $nin: [null, ""] },
-      // email: { $nin: [null, ""] },
-      // address1: { $nin: [null, ""] },
-      // city: { $nin: [null, ""] },
-      // gotra: { $nin: [null, ""] },
-      // kuldevi: { $nin: [null, ""] },
-      // member_name: { $nin: [null, ""] },
-
-      lm_no: { $nin: [null, ""] },
-      year: { $nin: [null, ""] },
-      col_y: { $nin: [null, ""] },
-      member_name: { $nin: [null, ""] },
-      card_issue: { $nin: [null, ""] },
-      add: { $nin: [null, ""] },
-      dob: { $nin: [null, ""] },
-      address1: { $nin: [null, ""] },
-      address_extra: { $nin: [null, ""] },
-      city: { $nin: [null, ""] },
-      pin: { $nin: [null, ""] },
-      contact_no: { $nin: [null, ""] },
-      email: { $nin: [null, ""] },
-      gotra: { $nin: [null, ""] },
-      kuldevi: { $nin: [null, ""] },
-      gender: { $nin: [null, ""] },
-      category: { $nin: [null, ""] },
-      photo: { $nin: [null, ""] },
+      $expr: { $ne: ["$createdAt", "$updatedAt"] } 
     });
 
     res.status(200).json(updatedMembers);
   } catch (error) {
     console.error("Error fetching updated life members:", error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
-
 module.exports = {
   createLifeMember,
   searchLifeMember,
