@@ -6,6 +6,7 @@ createLifeMember,
   getAllLifeMembers,
   updateLifeMember,
   getUpdatedLifeMembers,
+  getNewLifeMembers,
 
 } = require("../controllers/lifememberregistration");
 
@@ -29,6 +30,8 @@ router.patch("/life-members/:lm_no",setRegistrationContext,
   upload.fields([{ name: "photo", maxCount: 1 }]), updateLifeMember);
 
 router.get("/updated-members", getUpdatedLifeMembers);
+
+router.get("/life-members/new", getNewLifeMembers);
 
 
 module.exports = router;

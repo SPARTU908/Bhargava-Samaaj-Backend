@@ -203,10 +203,42 @@ const getUpdatedLifeMembers = async (req, res) => {
     });
   }
 };
+
+const getNewLifeMembers = async (req, res) => {
+  try {
+    const { from, to } = req.query;
+
+    let filter = {};
+
+    if (from || to) {
+      // Custom date range if provided
+      filter.createdAt = {};
+      if (from) filter.createdAt.$gte = new Date(from);
+      if (to) filter.createdAt.$lte = new Date(to);
+    } else {
+      // Default: members registered TODAY (UTC)
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setUTCDate(today.getUTCDate() + 1);
+
+      filter.createdAt = { $gte: today, $lt: tomorrow };
+    }
+
+    const newMembers = await LifeMember.find(filter).sort({ createdAt: -1 });
+
+    res.status(200).json(newMembers);
+  } catch (error) {
+    console.error("Error fetching new life members:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
 module.exports = {
   createLifeMember,
   searchLifeMember,
   getAllLifeMembers,
   updateLifeMember,
   getUpdatedLifeMembers,
+  getNewLifeMembers,
 };
