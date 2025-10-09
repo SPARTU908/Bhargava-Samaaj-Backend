@@ -157,41 +157,10 @@ const getAllLifeMembers = async (req, res) => {
   }
 };
 
-// const getUpdatedLifeMembers = async (req, res) => {
-//   try {
-//     const updatedMembers = await LifeMember.find({
-//      lm_no: { $nin: [null, ""] },
-//       year: { $nin: [null, ""] },
-//       col_y: { $nin: [null, ""] },
-//       member_name: { $nin: [null, ""] },
-//       card_issue: { $nin: [null, ""] },
-//       add: { $nin: [null, ""] },
-//       dob: { $nin: [null, ""] },
-//       address1: { $nin: [null, ""] },
-//       address_extra: { $nin: [null, ""] },
-//       city: { $nin: [null, ""] },
-//       pin: { $nin: [null, ""] },
-//       contact_no: { $nin: [null, ""] },
-//       email: { $nin: [null, ""] },
-//       gotra: { $nin: [null, ""] },
-//       kuldevi: { $nin: [null, ""] },
-//       gender: { $nin: [null, ""] },
-//       category: { $nin: [null, ""] },
-//       photo: { $nin: [null, ""] },
-//     });
-
-//     res.status(200).json(updatedMembers);
-//   } catch (error) {
-//     console.error("Error fetching updated life members:", error);
-//     res
-//       .status(500)
-//       .json({ message: "Internal server error", error: error.message });
-//   }
-// };
 const getUpdatedLifeMembers = async (req, res) => {
   try {
     const updatedMembers = await LifeMember.find({
-      $expr: { $ne: ["$createdAt", "$updatedAt"] } 
+      $expr: { $ne: ["$createdAt", "$updatedAt"] },
     });
 
     res.status(200).json(updatedMembers);
@@ -206,31 +175,19 @@ const getUpdatedLifeMembers = async (req, res) => {
 
 const getNewLifeMembers = async (req, res) => {
   try {
-    const { from, to } = req.query;
-
-    let filter = {};
-
-    if (from || to) {
-      // Custom date range if provided
-      filter.createdAt = {};
-      if (from) filter.createdAt.$gte = new Date(from);
-      if (to) filter.createdAt.$lte = new Date(to);
-    } else {
-      // Default: members registered TODAY (UTC)
-      const today = new Date();
-      today.setUTCHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setUTCDate(today.getUTCDate() + 1);
-
-      filter.createdAt = { $gte: today, $lt: tomorrow };
-    }
-
-    const newMembers = await LifeMember.find(filter).sort({ createdAt: -1 });
+    const newMembers = await LifeMember.find({
+      createdAt: { $exists: true },
+      updatedAt: { $exists: true },
+      $expr: { $eq: ["$createdAt", "$updatedAt"] },
+    }).sort({ createdAt: -1 });
 
     res.status(200).json(newMembers);
   } catch (error) {
     console.error("Error fetching new life members:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 
