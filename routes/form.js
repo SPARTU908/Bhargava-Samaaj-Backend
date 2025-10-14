@@ -4,7 +4,7 @@ const {
   getApprovedFormData,
   getPendingFormData,
   reviewForm,
-  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser
+  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
 const upload = require("../middleware/upload.js");
@@ -37,10 +37,11 @@ router.get("/reject/count",getRejectedFormCount);
 router.get("/rejected", getRejectedForms);
 router.get("/approved/count",getFormCount);
 router.delete('/deleteUser/:email', deleteUser);
-// router.patch('/update/:email',updateUserDetails);
+router.post("/verify-reset-otp", verifyResetOtp);
+
 
 const setProfileContext = (req, res, next) => {
-  req.uploadContext = 'matrimonial'; // or some relevant folder, maybe "profile" or "membership"
+  req.uploadContext = 'matrimonial'; 
   next();
 };
 
@@ -53,5 +54,7 @@ router.patch(
   ]),
   updateUserDetails
 );
+
+router.post("/request-reset-otp", requestResetOtp);
 
 module.exports = router;

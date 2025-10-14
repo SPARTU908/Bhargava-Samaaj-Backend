@@ -2,7 +2,6 @@ const Member = require("../models/membership");
 const Payment = require("../models/payment");
 const sendEmail = require("../mailsend.js");
 
-
 const createPayment = async (req, res) => {
   try {
     const { memberId, transactionId } = req.body;
@@ -25,7 +24,7 @@ const createPayment = async (req, res) => {
       subject: "Payment Received - Thank You",
       text: `Dear ${member.username}, we have successfully received your payment. Transaction ID: ${transactionId}`,
       html: `
-  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
     <h2 style="color:#0066cc;">Payment Confirmation</h2>
     <p>Dear <b>${member.username}</b>,</p>
 

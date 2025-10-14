@@ -13,8 +13,6 @@ function getFolderByContext(context) {
    return "others";
 }
 
-
-
 const s3 = new S3Client({
   region: process.env.DO_SPACES_REGION, 
   endpoint: process.env.DO_SPACES_ENDPOINT, 
@@ -25,10 +23,10 @@ const s3 = new S3Client({
   },
 });
 
-// Multer S3 storage (v3-compatible)
+
 const storage = multerS3({
   s3: s3,
-  bucket: process.env.DO_SPACES_BUCKET, // your space name
+  bucket: process.env.DO_SPACES_BUCKET, 
   acl: "public-read",
   key: function (req, file, cb) {
     const folder = getFolderByContext(req.uploadContext || "others");

@@ -6,9 +6,7 @@ const registerMagazine = async (req, res) => {
       name, dob, address, city, pin,
       contact, email, transactionId
     } = req.body;
-
- 
-    const signature = req.files?.signature?.[0]?.location;
+   const signature = req.files?.signature?.[0]?.location;
 
     if (!signature) {
       return res.status(400).json({ message: 'Signature file is required.' });
@@ -26,7 +24,7 @@ const registerMagazine = async (req, res) => {
       transactionId,
     });
 
-    await newMagazine.save();
+   await newMagazine.save();
 
     res.status(201).json({
       success: true,
@@ -51,6 +49,5 @@ const getAllMagazines = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch magazine registration users" });
   }
 };
-
 
 module.exports = { registerMagazine , getAllMagazines};
