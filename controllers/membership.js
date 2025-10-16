@@ -5,7 +5,6 @@ const cloudinary = require("../utils/cloudinary");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../mailsend.js");
 
-
 const createMember = async (req, res) => {
   try {
     const member = new Member(req.body);
@@ -26,7 +25,6 @@ const createMember = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 const loginMember = async (req, res) => {
   try {
@@ -66,26 +64,18 @@ const loginMember = async (req, res) => {
 const uploadFormFile = async (req, res) => {
   try {
     const memberId = req.params.id;
-
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
-
     const filePath = req.file.path;
     const fileType = path.extname(req.file.originalname).toLowerCase();
     const resourceType = fileType === ".pdf" ? "raw" : "image";
-
-    // ✅ Upload to Cloudinary
     const cloudinaryResponse = await cloudinary.uploader.upload(filePath, {
-      folder: "uploads/forms", // Optional Cloudinary folder
+      folder: "uploads/forms",
       resource_type: resourceType,
     });
-
-    // ✅ Delete local file
-    fs.unlinkSync(filePath);
-
-    // ✅ Save Cloudinary URL in MongoDB
-    const updatedMember = await Member.findByIdAndUpdate(
+fs.unlinkSync(filePath);
+ const updatedMember = await Member.findByIdAndUpdate(
       memberId,
       { uploadForm: cloudinaryResponse.secure_url },
       { new: true }
@@ -139,15 +129,13 @@ const getAllMembers = async (req, res) => {
 
 const getMemberCount = async (req, res) => {
   try {
-    const count = await Member.countDocuments(); 
+    const count = await Member.countDocuments();
     res.status(200).json({ count });
   } catch (error) {
     console.log("Error fetching member count:", error);
     res.status(500).json({ error: "Failed to fetch count" });
   }
 };
-
-
 
 const updateMemberStatus = async (req, res) => {
   try {
@@ -170,11 +158,11 @@ const updateMemberStatus = async (req, res) => {
       return res.status(404).json({ message: "Member not found" });
     }
 
-    // Send email when the form is approved
+   
     if (isFormApproved) {
-      // Send an email using the sendEmail utility function
+      
       await sendEmail({
-        to: updatedMember.email, // assuming the member object has an email field
+        to: updatedMember.email, 
         subject: "Your Form has been Approved",
         text: `Hello , your form has been approved.`,
         html: `
@@ -209,7 +197,6 @@ const updateMemberStatus = async (req, res) => {
   }
 };
 
-
 const dispatchMemberForm = async (req, res) => {
   try {
     const memberId = req.params.id;
@@ -219,13 +206,11 @@ const dispatchMemberForm = async (req, res) => {
       return res.status(404).json({ message: "Member not found" });
     }
 
- 
     if (member.isDispatched) {
       return res
         .status(400)
         .json({ message: "This member is already dispatched" });
     }
-
 
     await sendEmail({
       to: member.email,
@@ -237,7 +222,6 @@ const dispatchMemberForm = async (req, res) => {
         <p>Regards,<br>Bhargava Samaaj Global</p>
       `,
     });
-
 
     member.isDispatched = true;
     member.dispatchedAt = new Date();
@@ -257,22 +241,27 @@ const dispatchMemberForm = async (req, res) => {
   }
 };
 
-
-
 const uploadFormFileMulti = async (req, res) => {
   try {
     const memberId = req.params.id;
 
-    if (!req.files || !req.files.photo || !req.files.signature || !req.files.uploadAadharUser) {
-      return res.status(400).json({ error: "Photo, signature and Aadhar card files are required." });
+    if (
+      !req.files ||
+      !req.files.photo ||
+      !req.files.signature ||
+      !req.files.uploadAadharUser
+    ) {
+      return res
+        .status(400)
+        .json({
+          error: "Photo, signature and Aadhar card files are required.",
+        });
     }
 
- 
     const photoUrl = req.files.photo[0].location;
     const signatureUrl = req.files.signature[0].location;
     const aadharUrl = req.files.uploadAadharUser[0].location;
 
-  
     const updatedMember = await Member.findByIdAndUpdate(
       memberId,
       {
@@ -296,7 +285,6 @@ const uploadFormFileMulti = async (req, res) => {
     res.status(500).json({ error: "Upload failed", details: error.message });
   }
 };
-
 
 module.exports = {
   createMember,

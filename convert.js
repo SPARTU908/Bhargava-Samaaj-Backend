@@ -1,29 +1,26 @@
 const csv = require("csvtojson");
 const fs = require("fs");
 
-const csvFilePath = "ABBS Life members upto 25.8.2025.csv";
+const csvFilePath = "ABBS Life members - Adhiveshan 2025 registration.csv";
 
 
 const headers = [
-  "sl",
-  "duplicate_of",
-  "col_x",        
-  "lm_no",
-  "year",
-  "col_y",        
-  "member_name",
-  "card_issue",
-  "add",
-  "dob",
-  "address1",
-  "address_extra",
-  "new_col",
-  "city",
-  "pin",
-  "rect_no",
-  "amount",
-  "contact_no",
-  "email",
+  "SL",
+  "Col_x",
+  "LM_NO",
+  "Year",
+  "Title",        
+  "Member_Name",
+  "Card_Issued",
+  "S_O_D_O_W_0",
+  "Date_of_Birth",
+  "Address",
+  "City",
+  "Pin",
+  "Contact_No",
+  "Email",
+  "Gotra",
+  "Kuldevi",
 ];
 
 csv({
@@ -44,8 +41,8 @@ csv({
     return obj;
   });
 
-  fs.writeFileSync("lifemembers.json", JSON.stringify(mapped, null, 2), "utf-8");
-  console.log("✅ Clean JSON created: lifemembers.json");
+  fs.writeFileSync("newlifemembers.json", JSON.stringify(mapped, null, 2), "utf-8");
+  console.log("✅ Clean JSON created: newlifemembers.json");
 });
 
 

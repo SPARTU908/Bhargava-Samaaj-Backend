@@ -26,7 +26,7 @@ const saveFormData = async (req, res) => {
     const newForm = new UserForm(formData);
     await newForm.save();
 
-    // Success response
+   
     res.status(201).json({
       message: "Form data saved successfully",
       status: "pending",
@@ -77,7 +77,7 @@ const reviewForm = async (req, res) => {
       return res.status(404).json({ message: "Form not found" });
     }
 
-    // Send email on approval
+  
     if (action === "approve") {
       await sendEmail({
         to: updatedForm.email,
@@ -155,7 +155,7 @@ const getRejectedFormCount = async (req, res) => {
 const getRejectedForms = async (req, res) => {
   try {
     const rejectedForms = await UserForm.find({ status: "rejected" });
-    res.status(200).json({ data: rejectedForms }); // Return array under `data`
+    res.status(200).json({ data: rejectedForms }); 
   } catch (error) {
     console.error("Error fetching rejected forms:", error);
     res.status(500).json({ error: "Failed to fetch rejected forms" });

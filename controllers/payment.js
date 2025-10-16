@@ -18,7 +18,7 @@ const createPayment = async (req, res) => {
       transactionId,
     });
 
-    // ✅ Send thank you email
+
     await sendEmail({
       to: member.email,
       subject: "Payment Received - Thank You",

@@ -1,49 +1,46 @@
-const LifeMember = require("../models/lifememberregistration");
+const NewLifeMember = require("../models/lifememberregistration");
+const sendEmail = require('../mailsend');
 
 const createLifeMember = async (req, res) => {
   if (req.files && req.files.photo && req.files.photo[0]) {
-    console.log("Photo upload file object:", req.files.photo[0]);
   } else {
     console.log("No photo file uploaded");
   }
-
   try {
     const {
-      lm_no,
-      year,
-      col_y,
-      member_name,
-      card_issue,
-      add,
-      dob,
-      contact_no,
-      email,
-      address1,
-      address_extra,
-      city,
-      pin,
-      gotra,
-      kuldevi,
+      LM_NO,
+      Year,
+      Title,
+      Member_Name,
+      Card_Issued,
+      S_O_D_O_W_O,
+      Date_of_Birth,
+      Address,
+      City,
+      Pin,
+      Contact_No,
+      Email,
+      Gotra,
+      Kuldevi,
       gender,
       category,
     } = req.body;
 
     if (
-      !lm_no ||
-      !year ||
-      !col_y ||
-      !card_issue ||
-      !add ||
-      !dob ||
-      !member_name ||
-      !contact_no ||
-      !email ||
-      !address1 ||
-      !address_extra ||
-      !city ||
-      !pin ||
-      !gotra ||
-      !kuldevi ||
+      !LM_NO ||
+      !Year ||
+      !Title ||
+      !Member_Name ||
+      !Card_Issued ||
+      !S_O_D_O_W_O ||
+      !Date_of_Birth ||
+      !Address ||
+      !City ||
+      !Pin ||
+      !Contact_No ||
+      !Email ||
+      !Gotra ||
+      !Kuldevi ||
       !gender ||
       !category
     ) {
@@ -52,7 +49,7 @@ const createLifeMember = async (req, res) => {
         .json({ message: "All required fields must be provided." });
     }
 
-    const existingMember = await LifeMember.findOne({ lm_no });
+    const existingMember = await NewLifeMember.findOne({ LM_NO });
     if (existingMember) {
       return res
         .status(409)
@@ -67,28 +64,47 @@ const createLifeMember = async (req, res) => {
       return res.status(400).json({ message: "Photo is required." });
     }
 
-    const newMember = new LifeMember({
-      lm_no,
-      year,
-      col_y,
-      member_name,
-      card_issue,
-      add,
-      dob,
-      contact_no,
-      email,
-      address1,
-      address_extra,
-      city,
-      pin,
-      gotra,
-      kuldevi,
+    const newMember = new NewLifeMember({
+      LM_NO,
+      Year,
+      Title,
+      Member_Name,
+      Card_Issued,
+      S_O_D_O_W_O,
+      Date_of_Birth,
+      Address,
+      City,
+      Pin,
+      Contact_No,
+      Email,
+      Gotra,
+      Kuldevi,
       gender,
       category,
       photo: photoUrl,
     });
 
     await newMember.save();
+
+    
+try {
+      await sendEmail({
+        to: Email,
+        subject: "Registration Confirmation - ABBS Life Membership",
+        html: `
+          <p>Dear ${Member_Name},</p>
+          <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
+          <p>We have successfully received your registration details.</p>
+          <p>Please keep this email for your reference.</p>
+          <p>If you have any queries, please contact the ABBS office.</p>
+          <br/>
+          <p>Best regards,<br/>ABBS Conference Team</p>
+        `,
+      });
+      console.log("Confirmation email sent successfully");
+    } catch (emailError) {
+      console.error("Error sending confirmation email:", emailError);
+    }
 
     res
       .status(201)
@@ -103,9 +119,9 @@ const createLifeMember = async (req, res) => {
 
 const searchLifeMember = async (req, res) => {
   try {
-    const { lm_no } = req.params;
+    const { LM_NO } = req.params;
 
-    const member = await LifeMember.findOne({ lm_no });
+    const member = await NewLifeMember.findOne({ LM_NO });
 
     if (!member) {
       return res.status(404).json({ message: "Life member not found." });
@@ -119,7 +135,7 @@ const searchLifeMember = async (req, res) => {
 };
 
 const updateLifeMember = async (req, res) => {
-  const { lm_no } = req.params;
+  const { LM_NO } = req.params;
   const updateData = { ...req.body };
 
   if (req.files && req.files.photo && req.files.photo[0]) {
@@ -127,14 +143,31 @@ const updateLifeMember = async (req, res) => {
   }
 
   try {
-    const updatedMember = await LifeMember.findOneAndUpdate(
-      { lm_no: lm_no },
+    const updatedMember = await NewLifeMember.findOneAndUpdate(
+      { LM_NO: LM_NO },
       updateData,
       { new: true, runValidators: true }
     );
 
     if (!updatedMember) {
       return res.status(404).json({ message: "Life member not found" });
+    }
+  try {
+      await sendEmail({
+        to: updatedMember.Email,
+        subject: 'Life Membership Update Confirmation - ABBS',
+        html: `
+          <p>Dear ${updatedMember.Member_Name},</p>
+          <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
+          <p>Your life membership details have been successfully updated.</p>
+          <p>If you did not make this change or have any questions, please contact the ABBS office.</p>
+          <br/>
+          <p>Best regards,<br/>ABBS Conference Team</p>
+        `,
+      });
+      console.log('Update confirmation email sent');
+    } catch (emailError) {
+      console.error('Error sending update confirmation email:', emailError);
     }
 
     res.status(200).json({
@@ -147,9 +180,11 @@ const updateLifeMember = async (req, res) => {
   }
 };
 
+ 
+
 const getAllLifeMembers = async (req, res) => {
   try {
-    const members = await LifeMember.find();
+    const members = await NewLifeMember.find();
     res.status(200).json(members);
   } catch (error) {
     console.error("Fetch all error:", error);
@@ -159,7 +194,7 @@ const getAllLifeMembers = async (req, res) => {
 
 const getUpdatedLifeMembers = async (req, res) => {
   try {
-    const updatedMembers = await LifeMember.find({
+    const updatedMembers = await NewLifeMember.find({
       $expr: { $ne: ["$createdAt", "$updatedAt"] },
     });
 
@@ -175,7 +210,7 @@ const getUpdatedLifeMembers = async (req, res) => {
 
 const getNewLifeMembers = async (req, res) => {
   try {
-    const newMembers = await LifeMember.find({
+    const newMembers = await NewLifeMember.find({
       createdAt: { $exists: true },
       updatedAt: { $exists: true },
       $expr: { $eq: ["$createdAt", "$updatedAt"] },

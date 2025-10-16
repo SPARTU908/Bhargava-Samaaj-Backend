@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const sendEmail = require("../mailsend.js");
 
 const registerMember = async (req, res) => {
-  console.log("Received data:", req.body);
+  
   try {
     const {
       name,
@@ -66,8 +66,6 @@ const loginMember = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // ✅ No status check — all users can log in
-
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
@@ -124,7 +122,7 @@ const reviewVivahMember = async (req, res) => {
       return res.status(404).json({ error: "Member not found" });
     }
 
-    // 🔁 Toggle logic
+ 
     let newStatus = "pending";
     if (action === "approve") {
       newStatus = user.status === "approved" ? "pending" : "approved";
@@ -135,7 +133,7 @@ const reviewVivahMember = async (req, res) => {
     user.status = newStatus;
     await user.save();
 
-    // ✅ Send email if approved
+   
     if (newStatus === "approved") {
       await sendEmail({
         to: user.email,

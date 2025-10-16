@@ -2,68 +2,69 @@ const mongoose = require("mongoose");
 
 const lifeMemberSchema = new mongoose.Schema(
   {
-    lm_no: {
+    LM_NO: {
       type: String,
       required: true,
       unique:true,
       index:true
     },
-    year: {
+    Year: {
       type: String,
       required: true,
     },
-    col_y: {
+    Title: {
       type: String,
       required: true,
     },
-    member_name: {
+    Member_Name: {
       type: String,
       required: true,
     },
-    card_issue: {
+    Card_Issued: {
       type: String,
       required: true,
     },
-    add: {
+    S_O_D_O_W_O: {
       type: String,
       required: true,
     },
-    dob: {
+    Date_of_Birth: {
       type: String,
       required: true,
     },
-    address1: {
+    Address: {
       type: String,
       required: true,
     },
-    address_extra: {
+    City: {
       type: String,
       required:true,
     },
-    city: {
+    
+    Pin: {
       type: String,
       required: true,
     },
-    pin: {
+    
+    Contact_No: {
       type: String,
       required: true,
     },
-    contact_no: {
+    
+    Email: {
       type: String,
       required: true,
     },
-    email: {
+    Gotra: {
       type: String,
       required: true,
     },
-    gotra: {
+    
+    Kuldevi: {
       type: String,
       required: true,
     },
-    kuldevi: {
-      type: String,
-      required: true,
-    },
+    
     gender: {
       type: String,
       required: true,
@@ -88,4 +89,4 @@ const lifeMemberSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("LifeMember", lifeMemberSchema);
+module.exports = mongoose.model("NewLifeMember", lifeMemberSchema);
