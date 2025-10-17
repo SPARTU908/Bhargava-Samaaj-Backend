@@ -96,12 +96,12 @@ try {
           <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
           <p>We have successfully received your registration details.</p>
           <p>Please keep this email for your reference.</p>
-          <p>If you have any queries, please contact the ABBS office.</p>
+          
           <br/>
           <p>Best regards,<br/>ABBS Conference Team</p>
         `,
       });
-      console.log("Confirmation email sent successfully");
+      
     } catch (emailError) {
       console.error("Error sending confirmation email:", emailError);
     }
@@ -120,7 +120,6 @@ try {
 const searchLifeMember = async (req, res) => {
   try {
     const { LM_NO } = req.params;
-
     const member = await NewLifeMember.findOne({ LM_NO });
 
     if (!member) {
@@ -160,12 +159,11 @@ const updateLifeMember = async (req, res) => {
           <p>Dear ${updatedMember.Member_Name},</p>
           <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
           <p>Your life membership details have been successfully updated.</p>
-          <p>If you did not make this change or have any questions, please contact the ABBS office.</p>
           <br/>
           <p>Best regards,<br/>ABBS Conference Team</p>
         `,
       });
-      console.log('Update confirmation email sent');
+     
     } catch (emailError) {
       console.error('Error sending update confirmation email:', emailError);
     }

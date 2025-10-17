@@ -1,4 +1,5 @@
 const AwardForm = require('../models/awardForm');
+const sendEmail = require("../mailsend");
 
 const registerAwardForm = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const registerAwardForm = async (req, res) => {
     const photo = req.files?.photo?.[0]?.location;
     const document1 = req.files?.document1?.[0]?.location;
     const document2 = req.files?.document2?.[0]?.location;
-
+ 
 
  if (!photo || !document1 ) {
       return res.status(400).json({ message: 'Photo and Documents are required.' });
@@ -30,6 +31,16 @@ const registerAwardForm = async (req, res) => {
     });
 
     await newForm.save();
+    await sendEmail({
+      to: email,
+      subject: "Maan Samman Form Submitted",
+      text: `Dear ${name},\n\nThank you for submitting your nomination form. Your submission has been received successfully.
+       
+        Best regards,
+        Bhargava Samaaj Global`,
+      
+     
+    });
 
     res.status(201).json({ message: 'Award form submitted successfully.', data: newForm });
   } catch (err) {
