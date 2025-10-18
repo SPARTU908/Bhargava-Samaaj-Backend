@@ -4,7 +4,7 @@ const lifeMemberSchema = new mongoose.Schema(
   {
     LM_NO: {
       type: String,
-      required: true,
+      // required: true,
       unique:true,
       index:true
     },

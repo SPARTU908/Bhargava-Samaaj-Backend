@@ -3,7 +3,7 @@ const router = express.Router();
 const upload = require('../middleware/upload');
 const { registerAwardForm,getAllUsers } = require('../controllers/awardForm');
 
-// Middleware to set context
+
 const setAwardFormContext = (req, res, next) => {
   req.uploadContext = 'awardform';
   next();

@@ -1,11 +1,122 @@
 const NewLifeMember = require("../models/lifememberregistration");
-const sendEmail = require('../mailsend');
+const sendEmail = require("../mailsend");
+
+// const createLifeMember = async (req, res) => {
+//   if (req.files && req.files.photo && req.files.photo[0]) {
+//   } else {
+//     console.log("No photo file uploaded");
+//   }
+//   try {
+//     const {
+//       LM_NO,
+//       Year,
+//       Title,
+//       Member_Name,
+//       Card_Issued,
+//       S_O_D_O_W_O,
+//       Date_of_Birth,
+//       Address,
+//       City,
+//       Pin,
+//       Contact_No,
+//       Email,
+//       Gotra,
+//       Kuldevi,
+//       gender,
+//       category,
+//     } = req.body;
+
+//     if (
+//       !LM_NO ||
+//       !Year ||
+//       !Title ||
+//       !Member_Name ||
+//       !Card_Issued ||
+//       !S_O_D_O_W_O ||
+//       !Date_of_Birth ||
+//       !Address ||
+//       !City ||
+//       !Pin ||
+//       !Contact_No ||
+//       !Email ||
+//       !Gotra ||
+//       !Kuldevi ||
+//       !gender ||
+//       !category
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ message: "All required fields must be provided." });
+//     }
+
+//     const existingMember = await NewLifeMember.findOne({ LM_NO });
+//     if (existingMember) {
+//       return res
+//         .status(409)
+//         .json({ message: "Life member with this LM No already exists." });
+//     }
+
+//     let photoUrl = "";
+//     if (req.files && req.files.photo && req.files.photo[0]) {
+//       photoUrl = req.files.photo[0].location;
+//     } else {
+//       console.log("❌ Photo not uploaded");
+//       return res.status(400).json({ message: "Photo is required." });
+//     }
+
+//     const newMember = new NewLifeMember({
+//       LM_NO,
+//       Year,
+//       Title,
+//       Member_Name,
+//       Card_Issued,
+//       S_O_D_O_W_O,
+//       Date_of_Birth,
+//       Address,
+//       City,
+//       Pin,
+//       Contact_No,
+//       Email,
+//       Gotra,
+//       Kuldevi,
+//       gender,
+//       category,
+//       photo: photoUrl,
+//     });
+
+//     await newMember.save();
+
+// try {
+//       await sendEmail({
+//         to: Email,
+//         subject: "Registration Confirmation - ABBS Life Membership",
+//         html: `
+//           <p>Dear ${Member_Name},</p>
+//           <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
+//           <p>We have successfully received your registration details.</p>
+//           <p>Please keep this email for your reference.</p>
+
+//           <br/>
+//           <p>Best regards,<br/>ABBS Conference Team</p>
+//         `,
+//       });
+
+//     } catch (emailError) {
+//       console.error("Error sending confirmation email:", emailError);
+//     }
+
+//     res
+//       .status(201)
+//       .json({ message: "Life member created successfully", data: newMember });
+//   } catch (error) {
+//     console.error("Create error:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Internal server error", error: error.message });
+//   }
+// };
 
 const createLifeMember = async (req, res) => {
-  if (req.files && req.files.photo && req.files.photo[0]) {
-  } else {
-    console.log("No photo file uploaded");
-  }
   try {
     const {
       LM_NO,
@@ -26,43 +137,16 @@ const createLifeMember = async (req, res) => {
       category,
     } = req.body;
 
-    if (
-      !LM_NO ||
-      !Year ||
-      !Title ||
-      !Member_Name ||
-      !Card_Issued ||
-      !S_O_D_O_W_O ||
-      !Date_of_Birth ||
-      !Address ||
-      !City ||
-      !Pin ||
-      !Contact_No ||
-      !Email ||
-      !Gotra ||
-      !Kuldevi ||
-      !gender ||
-      !category
-    ) {
-      return res
-        .status(400)
-        .json({ message: "All required fields must be provided." });
-    }
+    // const existingMember = await NewLifeMember.findOne({ LM_NO });
+    // if (existingMember) {
+    //   return res.status(400).json({ message: "LM_NO already exists" });
+    // }
 
-    const existingMember = await NewLifeMember.findOne({ LM_NO });
-    if (existingMember) {
-      return res
-        .status(409)
-        .json({ message: "Life member with this LM No already exists." });
+    const photoFile = req.files?.photo?.[0];
+    if (!photoFile) {
+      return res.status(400).json({ message: "Photo is required" });
     }
-
-    let photoUrl = "";
-    if (req.files && req.files.photo && req.files.photo[0]) {
-      photoUrl = req.files.photo[0].location;
-    } else {
-      console.log("❌ Photo not uploaded");
-      return res.status(400).json({ message: "Photo is required." });
-    }
+    const photo = photoFile.location;
 
     const newMember = new NewLifeMember({
       LM_NO,
@@ -81,13 +165,12 @@ const createLifeMember = async (req, res) => {
       Kuldevi,
       gender,
       category,
-      photo: photoUrl,
+      photo,
     });
 
     await newMember.save();
 
-    
-try {
+    try {
       await sendEmail({
         to: Email,
         subject: "Registration Confirmation - ABBS Life Membership",
@@ -101,19 +184,19 @@ try {
           <p>Best regards,<br/>ABBS Conference Team</p>
         `,
       });
-      
     } catch (emailError) {
       console.error("Error sending confirmation email:", emailError);
     }
 
-    res
+    return res
       .status(201)
-      .json({ message: "Life member created successfully", data: newMember });
+      .json({
+        message: "Life member registered successfully",
+        member: newMember,
+      });
   } catch (error) {
-    console.error("Create error:", error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    console.error("Error registering life member:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -151,10 +234,10 @@ const updateLifeMember = async (req, res) => {
     if (!updatedMember) {
       return res.status(404).json({ message: "Life member not found" });
     }
-  try {
+    try {
       await sendEmail({
         to: updatedMember.Email,
-        subject: 'Life Membership Update Confirmation - ABBS',
+        subject: "Life Membership Update Confirmation - ABBS",
         html: `
           <p>Dear ${updatedMember.Member_Name},</p>
           <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
@@ -163,9 +246,8 @@ const updateLifeMember = async (req, res) => {
           <p>Best regards,<br/>ABBS Conference Team</p>
         `,
       });
-     
     } catch (emailError) {
-      console.error('Error sending update confirmation email:', emailError);
+      console.error("Error sending update confirmation email:", emailError);
     }
 
     res.status(200).json({
@@ -177,8 +259,6 @@ const updateLifeMember = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
- 
 
 const getAllLifeMembers = async (req, res) => {
   try {

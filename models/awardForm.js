@@ -11,7 +11,7 @@ const awardForm = new mongoose.Schema({
      },
     code3:{
         type:String,
-        default: null
+       
      },
     name:{
         type:String,
