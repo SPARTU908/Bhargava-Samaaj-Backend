@@ -10,7 +10,7 @@ const lifeMemberSchema = new mongoose.Schema(
     },
     Year: {
       type: String,
-      required: true,
+      // required: true,
     },
     Title: {
       type: String,
@@ -81,7 +81,7 @@ const lifeMemberSchema = new mongoose.Schema(
     },
     photo: { 
         type: String,
-        required:true
+        // required:true
      },
   },
   {
