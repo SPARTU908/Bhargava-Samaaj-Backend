@@ -4,7 +4,7 @@ const sendEmail = require("../mailsend");
 const createLifeMember = async (req, res) => {
   try {
     const {
-      LM_NO,
+     
       Year,
       Title,
       Member_Name,
@@ -26,7 +26,7 @@ const createLifeMember = async (req, res) => {
     const photo = photoFile ? photoFile.location : null;
 
     const newMember = new NewLifeMember({
-      LM_NO,
+    
       Year,
       Title,
       Member_Name,
@@ -181,6 +181,23 @@ const getNewLifeMembers = async (req, res) => {
   }
 };
 
+
+const deleteLifeMembers= async(req,res)=>{
+ try {
+    const updatedMembers = await NewLifeMember.findOneAndDelete({
+      $expr: { $ne: ["$createdAt", "$updatedAt"] },
+    });
+
+    res.status(200).json(updatedMembers);
+  } catch (error) {
+    console.error("Error fetching updated life members:", error);
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+}
+
 module.exports = {
   createLifeMember,
   searchLifeMember,
@@ -188,4 +205,5 @@ module.exports = {
   updateLifeMember,
   getUpdatedLifeMembers,
   getNewLifeMembers,
+  deleteLifeMembers,
 };

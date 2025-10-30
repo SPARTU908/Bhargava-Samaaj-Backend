@@ -77,8 +77,7 @@ const reviewForm = async (req, res) => {
       return res.status(404).json({ message: "Form not found" });
     }
 
-  
-    if (action === "approve") {
+   if (action === "approve") {
       await sendEmail({
         to: updatedForm.email,
         subject: "Form Approved",
