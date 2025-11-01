@@ -7,6 +7,7 @@ const {
   updateLifeMember,
   getUpdatedLifeMembers,
   getNewLifeMembers,
+  softDeleteLifeMember
 
 } = require("../controllers/lifememberregistration");
 
@@ -27,12 +28,13 @@ router.post(
   upload.fields([{ name: "photo", maxCount: 1 }]),
   createLifeMember
 );
+
 router.patch("/life-members/:LM_NO",setRegistrationContext,
   upload.fields([{ name: "photo", maxCount: 1 }]), updateLifeMember);
 
 router.get("/updated-members", getUpdatedLifeMembers);
 
 router.get("/life-members/new", getNewLifeMembers);
-
+router.patch("/life-members/:id/delete", softDeleteLifeMember);
 
 module.exports = router;

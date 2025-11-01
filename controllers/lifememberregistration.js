@@ -4,7 +4,6 @@ const sendEmail = require("../mailsend");
 const createLifeMember = async (req, res) => {
   try {
     const {
-     
       Year,
       Title,
       Member_Name,
@@ -26,7 +25,6 @@ const createLifeMember = async (req, res) => {
     const photo = photoFile ? photoFile.location : null;
 
     const newMember = new NewLifeMember({
-    
       Year,
       Title,
       Member_Name,
@@ -65,12 +63,10 @@ const createLifeMember = async (req, res) => {
       console.error("Error sending confirmation email:", emailError);
     }
 
-    return res
-      .status(201)
-      .json({
-        message: "Life member registered successfully",
-        member: newMember,
-      });
+    return res.status(201).json({
+      message: "Life member registered successfully",
+      member: newMember,
+    });
   } catch (error) {
     console.error("Error registering life member:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -181,8 +177,31 @@ const getNewLifeMembers = async (req, res) => {
   }
 };
 
+const softDeleteLifeMember = async (req, res) => {
+  try {
+    const {id } = req.params;
+    console.log("Soft delete requested for ID:", id);
+    const member = await NewLifeMember.findByIdAndUpdate(
+      id,
+      { isDeleted: true, deletedAt: new Date() },
+      { new: true }
+    );
 
+    if (!member) {
+      return res.status(404).json({ message: "Life member not found" });
+    }
 
+    res.status(200).json({
+      message: "Life member deleted successfully",
+      data: member,
+    });
+  } catch (error) {
+    console.error("Error deleting life member:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
 
 module.exports = {
   createLifeMember,
@@ -191,5 +210,5 @@ module.exports = {
   updateLifeMember,
   getUpdatedLifeMembers,
   getNewLifeMembers,
-  
+  softDeleteLifeMember,
 };
