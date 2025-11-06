@@ -171,22 +171,36 @@ const getFormCount = async (req, res) => {
   }
 };
 
+
+
 const deleteUser = async (req, res) => {
   try {
-    const { email } = req.params;
-    const deletedUser = await UserForm.findOneAndDelete({ email });
+    const { id } = req.params;  
+    
+
+    const deletedUser = await UserForm.findByIdAndUpdate(
+      id, 
+      { 
+        status: 'deleted', 
+        deletedAt: new Date()  
+      },
+      { new: true }  
+    );
+
     if (!deletedUser) {
       return res.status(404).json({ error: "User not found" });
     }
+
     res.status(200).json({
-      message: "User deleted successfully",
+      message: "User soft deleted successfully",
       deletedUser,
     });
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Failed to delete user" });
+    res.status(500).json({ error: "Failed to soft delete user" });
   }
 };
+
 
 const updateUserDetails = async (req, res) => {
   try {

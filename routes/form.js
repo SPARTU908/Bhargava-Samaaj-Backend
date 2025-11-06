@@ -36,7 +36,7 @@ router.get("/pending/count", getPendingFormCount);
 router.get("/reject/count",getRejectedFormCount);
 router.get("/rejected", getRejectedForms);
 router.get("/approved/count",getFormCount);
-router.delete('/deleteUser/:email', deleteUser);
+router.delete('/deleteUser/:id', deleteUser);
 router.post("/verify-reset-otp", verifyResetOtp);
 
 

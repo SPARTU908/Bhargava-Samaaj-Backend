@@ -48,6 +48,7 @@ const userFormSchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+    deletedAt: { type: Date, default: null },
     submittedAt: {
       type: Date,
       default: Date.now,
