@@ -4,8 +4,6 @@ const bcrypt = require("bcryptjs");
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-   
     const user = await UserForm.findOne({
       email: { $regex: `^${email}$`, $options: 'i' }
     });
@@ -25,6 +23,7 @@ const loginUser = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 
 const resetPassword = async (req, res) => {
