@@ -53,35 +53,49 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const getUserByEmail = async (req, res) => {
-  try {
-    const { email } = req.params;
+// const getUserByEmail = async (req, res) => {
+//   try {
+//     const { email } = req.params;
 
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
-    }
+//     if (!email) {
+//       return res.status(400).json({ error: "Email is required" });
+//     }
 
-    const user = await UserForm.findOne({
-      email: { $regex: `^${email}$`, $options: "i" },
-    });
+//     const user = await UserForm.findOne({
+//       email: { $regex: `^${email}$`, $options: "i" },
+//     });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
 
-    const userObj = user.toObject();
+//     const userObj = user.toObject();
   
 
-    res.status(200).json(userObj);
+//     res.status(200).json(userObj);
+//   } catch (error) {
+//     console.error("Error fetching user by email:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await UserForm.findById(id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.status(200).json(user);
   } catch (error) {
-    console.error("Error fetching user by email:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Failed to fetch user" });
   }
 };
+
+
 
 
 module.exports = {
   loginUser,
   resetPassword,
-  getUserByEmail
+  getUserById,
 };

@@ -112,24 +112,6 @@ const reviewForm = async (req, res) => {
   }
 };
 
-// const getUserStatus = async (req, res) => {
-//   try {
-//     const email = req.params.email.toLowerCase();
-//     const user = await UserForm.findOne({
-//       email: { $regex: `^${email}$`, $options: "i" },
-//     });
-
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     res.status(200).json({ status: user.status });
-//   } catch (error) {
-//     console.error("Error fetching user status:", error);
-//     res.status(500).json({ error: "Failed to fetch user status" });
-//   }
-// };
-
 const getUserStatus = async (req, res) => {
   try {
     const email = req.params.email.toLowerCase();
@@ -141,16 +123,20 @@ const getUserStatus = async (req, res) => {
     }
  const approvedUser = users.find((u) => u.status === "approved");
     if (approvedUser) {
-      return res.status(200).json({ status: approvedUser.status });
+      return res.status(200).json({ status: approvedUser.status,  _id: approvedUser._id, });
     }
- const latestUser =
-      users.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))[0];
- return res.status(200).json({ status: latestUser.status });
+    const latestUser =
+    users.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))[0];
+ return res.status(200).json({ status: latestUser.status,_id: latestUser._id, });
   } catch (error) {
     console.error("Error fetching user status:", error);
     res.status(500).json({ error: "Failed to fetch user status" });
   }
 };
+
+
+
+
 
 
 const getPendingFormCount = async (req, res) => {
@@ -227,7 +213,7 @@ const deleteUser = async (req, res) => {
 
 const updateUserDetails = async (req, res) => {
   try {
-    const { email } = req.params;
+    const { id } = req.params;
     const updateData = { ...req.body };
     if (req.files) {
       if (req.files.photo && req.files.photo[0]) {
@@ -237,7 +223,7 @@ const updateUserDetails = async (req, res) => {
         updateData.bioData = req.files.bioData[0].location;
       }
     }
-    const updatedUser = await UserForm.findOneAndUpdate({ email }, updateData, {
+    const updatedUser = await UserForm.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
@@ -347,6 +333,23 @@ const verifyResetOtp = async (req, res) => {
 };
 
 
+const getDeletedForms = async (req, res) => {
+  try {
+    const deleteForms = await UserForm.find({ status: "deleted" });
+    res.status(200).json({ data: deleteForms }); 
+  } catch (error) {
+    console.error("Error fetching deleted forms:", error);
+    res.status(500).json({ error: "Failed to fetch deleted forms" });
+  }
+};
+
+
+
+
+
+
+
+
 
 module.exports = {
   saveFormData,
@@ -362,4 +365,5 @@ module.exports = {
   updateUserDetails,
   requestResetOtp,
   verifyResetOtp,
+  getDeletedForms,
 };

@@ -4,6 +4,7 @@ const {
   getApprovedFormData,
   getPendingFormData,
   reviewForm,
+  getDeletedForms,
   getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
@@ -35,6 +36,7 @@ router.get('/admin/pending', protect(['superadmin', 'matrimonialadmin']),  getPe
 router.get("/pending/count", getPendingFormCount);
 router.get("/reject/count",getRejectedFormCount);
 router.get("/rejected", getRejectedForms);
+router.get("/deleted",getDeletedForms);
 router.get("/approved/count",getFormCount);
 router.delete('/deleteUser/:id', deleteUser);
 router.post("/verify-reset-otp", verifyResetOtp);
@@ -46,7 +48,7 @@ const setProfileContext = (req, res, next) => {
 };
 
 router.patch(
-  '/update/:email',
+  '/update/:id',
   setProfileContext,
   upload.fields([
     { name: 'photo', maxCount: 1 },
