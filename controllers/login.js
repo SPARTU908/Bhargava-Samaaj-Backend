@@ -1,26 +1,62 @@
 const UserForm = require("../models/form");
 const bcrypt = require("bcryptjs");
 
+// const loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await UserForm.findOne({
+//       email: { $regex: `^${email}$`, $options: 'i' }
+//     });
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     const isMatch = password === user.password;
+//     if (!isMatch) {
+//       return res.status(401).json({ error: "Incorrect password" });
+//     }
+
+//     res.status(200).json({ message: "Login successful", userId: user._id });
+//   } catch (error) {
+//     console.error("Login Error:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+
+    // Find the exact user using email + password
     const user = await UserForm.findOne({
-      email: { $regex: `^${email}$`, $options: 'i' }
+      email: { $regex: `^${email}$`, $options: "i" },
+      password: password
     });
 
+    // If user not found → invalid email/password
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const isMatch = password === user.password;
-    if (!isMatch) {
-      return res.status(401).json({ error: "Incorrect password" });
-    }
+    // Successful login
+    return res.status(200).json({
+      message: "Login successful",
+      userId: user._id,
+      email: user.email,
+      name: user.name,
+      status: user.status
+    });
 
-    res.status(200).json({ message: "Login successful", userId: user._id });
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

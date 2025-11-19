@@ -5,6 +5,7 @@ const {
   getPendingFormData,
   reviewForm,
   getDeletedForms,
+//  findAllDuplicateEmails,
   getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
@@ -40,6 +41,7 @@ router.get("/deleted",getDeletedForms);
 router.get("/approved/count",getFormCount);
 router.delete('/deleteUser/:id', deleteUser);
 router.post("/verify-reset-otp", verifyResetOtp);
+// router.get("/duplicates", findAllDuplicateEmails);
 
 
 const setProfileContext = (req, res, next) => {

@@ -34,8 +34,8 @@ const registerAwardForm = async (req, res) => {
     await sendEmail({
       to: email,
       subject: "Maan Samman Form Submitted",
-      text: `Dear ${name},\nThank you for submitting your nomination form. Your submission has been received successfully.
-       
+      text: `Dear ${name},\nThank you for submitting your nomination form. 
+        Your submission has been received successfully.
         Best regards,
         Bhargava Samaaj Global`,
       

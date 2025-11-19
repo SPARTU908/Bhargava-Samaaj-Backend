@@ -117,6 +117,7 @@ const getUserStatus = async (req, res) => {
     const email = req.params.email.toLowerCase();
    const users = await UserForm.find({
       email: { $regex: `^${email}$`, $options: "i" },
+      password: req.body.password,
     });
    if (!users || users.length === 0) {
       return res.status(404).json({ error: "User not found" });
@@ -133,10 +134,6 @@ const getUserStatus = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch user status" });
   }
 };
-
-
-
-
 
 
 const getPendingFormCount = async (req, res) => {
@@ -179,8 +176,6 @@ const getFormCount = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch count" });
   }
 };
-
-
 
 const deleteUser = async (req, res) => {
   try {
@@ -345,8 +340,42 @@ const getDeletedForms = async (req, res) => {
 
 
 
+// const findAllDuplicateEmails = async (req, res) => {
+//   try {
+//     const duplicates = await UserForm.aggregate([
+//       {
+//         $group: {
+//           _id: { email: { $toLower: "$email" } }, // case-insensitive grouping
+//           users: { $push: "$$ROOT" },
+//           count: { $sum: 1 }
+//         }
+//       },
+//       {
+//         $match: {
+//           count: { $gt: 1 } // Only emails appearing more than once
+//         }
+//       },
+//       {
+//         $project: {
+//           _id: 0,
+//           email: "$_id.email",
+//           count: 1,
+//           users: 1
+//         }
+//       }
+//     ]);
 
+//     res.status(200).json({
+//       message: "Duplicate emails found",
+//       totalDuplicateGroups: duplicates.length,
+//       duplicates,
+//     });
 
+//   } catch (error) {
+//     console.error("Error finding duplicate emails:", error);
+//     res.status(500).json({ error: "Failed to find duplicate emails" });
+//   }
+// };
 
 
 
@@ -366,4 +395,5 @@ module.exports = {
   requestResetOtp,
   verifyResetOtp,
   getDeletedForms,
+//  findAllDuplicateEmails,
 };
