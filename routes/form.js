@@ -5,16 +5,14 @@ const {
   getPendingFormData,
   reviewForm,
   getDeletedForms,
-//  findAllDuplicateEmails,
-  // getUserStatus,
-  getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
+ getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
 const upload = require("../middleware/upload.js");
 
 const router = express.Router();
 
-// router.post("/submit", saveFormData); 
+
 
 router.post(
   '/submit',
@@ -32,7 +30,6 @@ router.post(
 router.get("/approved", getApprovedFormData); 
 router.get("/admin/pending",  getPendingFormData); 
 router.post("/admin/review",  reviewForm); 
-// router.get('/status/:email', getUserStatus);
 router.get('/approved', protect(['superadmin', 'matrimonialadmin']), getApprovedFormData);
 router.get('/admin/pending', protect(['superadmin', 'matrimonialadmin']),  getPendingFormData);
 router.get("/pending/count", getPendingFormCount);
@@ -42,7 +39,7 @@ router.get("/deleted",getDeletedForms);
 router.get("/approved/count",getFormCount);
 router.delete('/deleteUser/:id', deleteUser);
 router.post("/verify-reset-otp", verifyResetOtp);
-// router.get("/duplicates", findAllDuplicateEmails);
+
 
 
 const setProfileContext = (req, res, next) => {
