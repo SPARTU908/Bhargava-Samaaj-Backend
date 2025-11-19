@@ -6,7 +6,8 @@ const {
   reviewForm,
   getDeletedForms,
 //  findAllDuplicateEmails,
-  getUserStatus,getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
+  // getUserStatus,
+  getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
 const upload = require("../middleware/upload.js");
@@ -31,7 +32,7 @@ router.post(
 router.get("/approved", getApprovedFormData); 
 router.get("/admin/pending",  getPendingFormData); 
 router.post("/admin/review",  reviewForm); 
-router.get('/status/:email', getUserStatus);
+// router.get('/status/:email', getUserStatus);
 router.get('/approved', protect(['superadmin', 'matrimonialadmin']), getApprovedFormData);
 router.get('/admin/pending', protect(['superadmin', 'matrimonialadmin']),  getPendingFormData);
 router.get("/pending/count", getPendingFormCount);

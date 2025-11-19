@@ -112,28 +112,28 @@ const reviewForm = async (req, res) => {
   }
 };
 
-const getUserStatus = async (req, res) => {
-  try {
-    const email = req.params.email.toLowerCase();
-   const users = await UserForm.find({
-      email: { $regex: `^${email}$`, $options: "i" },
-      password: req.body.password,
-    });
-   if (!users || users.length === 0) {
-      return res.status(404).json({ error: "User not found" });
-    }
- const approvedUser = users.find((u) => u.status === "approved");
-    if (approvedUser) {
-      return res.status(200).json({ status: approvedUser.status,  _id: approvedUser._id, });
-    }
-    const latestUser =
-    users.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))[0];
- return res.status(200).json({ status: latestUser.status,_id: latestUser._id, });
-  } catch (error) {
-    console.error("Error fetching user status:", error);
-    res.status(500).json({ error: "Failed to fetch user status" });
-  }
-};
+// const getUserStatus = async (req, res) => {
+//   try {
+//     const email = req.params.email.toLowerCase();
+//    const users = await UserForm.find({
+//       email: { $regex: `^${email}$`, $options: "i" },
+//       password: req.body.password,
+//     });
+//    if (!users || users.length === 0) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+//  const approvedUser = users.find((u) => u.status === "approved");
+//     if (approvedUser) {
+//       return res.status(200).json({ status: approvedUser.status,  _id: approvedUser._id, });
+//     }
+//     const latestUser =
+//     users.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))[0];
+//  return res.status(200).json({ status: latestUser.status,_id: latestUser._id, });
+//   } catch (error) {
+//     console.error("Error fetching user status:", error);
+//     res.status(500).json({ error: "Failed to fetch user status" });
+//   }
+// };
 
 
 const getPendingFormCount = async (req, res) => {
@@ -385,7 +385,7 @@ module.exports = {
   getApprovedFormData,
   getPendingFormData,
   reviewForm,
-  getUserStatus,
+  // getUserStatus,
   getPendingFormCount,
   getFormCount,
   getRejectedFormCount,
