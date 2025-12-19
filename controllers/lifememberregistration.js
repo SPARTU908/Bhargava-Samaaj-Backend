@@ -143,28 +143,14 @@ const getAllLifeMembers = async (req, res) => {
   }
 };
 
-// const getUpdatedLifeMembers = async (req, res) => {
-//   try {
-//     const updatedMembers = await NewLifeMember.find({
-//       $expr: { $ne: ["$createdAt", "$updatedAt"] },
-//     });
 
-//     res.status(200).json(updatedMembers);
-//   } catch (error) {
-//     console.error("Error fetching updated life members:", error);
-//     res.status(500).json({
-//       message: "Internal server error",
-//       error: error.message,
-//     });
-//   }
-// };
 
 const getUpdatedLifeMembers = async (req, res) => {
   try {
     const updatedMembers = await NewLifeMember.find({
       $and: [
-        { isDeleted: { $ne: true } }, // excludes deleted, includes docs without isDeleted
-        { $expr: { $ne: ["$createdAt", "$updatedAt"] } } // only updated ones
+        { isDeleted: { $ne: true } }, 
+        { $expr: { $ne: ["$createdAt", "$updatedAt"] } } 
       ]
     });
 

@@ -11,7 +11,7 @@ const userFormSchema = new mongoose.Schema(
     birthPlace: String,
     height: String,
     weight: String,
-    dob: Date,
+    dob: String,
     bloodGroup: String,
     manglik: String,
     gotra: String,
