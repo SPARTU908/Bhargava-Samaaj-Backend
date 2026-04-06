@@ -15,6 +15,8 @@ const registerAwardForm = async (req, res) => {
     const photo = req.files?.photo?.[0]?.location;
     const document1 = req.files?.document1?.[0]?.location;
     const document2 = req.files?.document2?.[0]?.location;
+
+  
  
 
  if (!photo || !document1 ) {
@@ -42,6 +44,7 @@ const registerAwardForm = async (req, res) => {
      
     });
 
+
     res.status(201).json({ message: 'Award form submitted successfully.', data: newForm });
   } catch (err) {
     if (err.code === 11000) {
@@ -66,4 +69,5 @@ const getAllUsers = async (req, res) => {
 
 
 
-module.exports = { registerAwardForm, getAllUsers };
+
+module.exports = { registerAwardForm, getAllUsers};
