@@ -1,49 +1,59 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const User = require('../models/user');
+const bcrypt = require("bcryptjs");
+const User = require("../models/user");
 
-router.get('/seed-admins', async (req, res) => {
+router.get("/seed-admins", async (req, res) => {
   try {
-  
-    await User.deleteMany({ role: { $in: ['superadmin', 'membershipadmin', 'matrimonialadmin', 'conferenceadmin'] } });
+    await User.deleteMany({
+      role: {
+        $in: [
+          "superadmin",
+          "membershipadmin",
+          "matrimonialadmin",
+          "conferenceadmin",
+        ],
+      },
+    });
 
-    // Hash passwords
-    const superAdminPass = await bcrypt.hash('Super@123', 10);
-    const membershipAdminPass = await bcrypt.hash('Membership@456', 10);
-    const matrimonialAdminPass = await bcrypt.hash('Matrimonial@789', 10);
-    const conferenceAdminPass = await bcrypt.hash('Conference@321', 10);  
-
-    // Define admin users
     const users = [
       {
-        email: 'superadmin@mysite.com',
-        password: superAdminPass,
-        role: 'superadmin',
+        email: "superadmin@mysite.com",
+        password: await bcrypt.hash(process.env.SUPERADMIN_PASS, 10),
+        role: "superadmin",
       },
       {
-        email: 'membershipadmin@mysite.com',
-        password: membershipAdminPass,
-        role: 'membershipadmin',
+        email: "membershipadmin@mysite.com",
+        password: await bcrypt.hash(process.env.MEMBERSHIPADMIN_PASS, 10),
+        role: "membershipadmin",
       },
       {
-        email: 'matrimonialadmin@mysite.com',
-        password: matrimonialAdminPass,
-        role: 'matrimonialadmin',
+        email: "matrimonialadmin@mysite.com",
+        password: await bcrypt.hash(process.env.MATRIMONIALADMIN_PASS, 10),
+        role: "matrimonialadmin",
       },
       {
-        email: 'conferenceadmin@mysite.com',  
-        password: conferenceAdminPass,       
-        role: 'conferenceadmin',            
+        email: "conferenceadmin@mysite.com",
+        password: await bcrypt.hash(process.env.CONFERENCEADMIN_PASS, 10),
+        role: "conferenceadmin",
       },
     ];
 
     await User.insertMany(users);
 
-    res.status(201).json({ message: 'Admins reseeded with new credentials including conference admin.' });
+    // TEST
+    const hash = await bcrypt.hash(process.env.MATRIMONIALADMIN_PASS, 10);
+
+    const admin = await User.findOne({
+      email: "matrimonialadmin@mysite.com",
+    });
+
+    res.status(201).json({
+      message: "Admins reseeded successfully",
+    });
   } catch (error) {
-    console.error('Error reseeding admins:', error);
-    res.status(500).json({ error: 'Seeding failed.' });
+    console.error(error);
+    res.status(500).json({ error: "Seeding failed" });
   }
 });
 

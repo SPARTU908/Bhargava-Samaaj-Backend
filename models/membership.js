@@ -16,6 +16,10 @@ const memberSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    spouseDob: {
+      type: Date,
+      required: true,
+    },
     pincode: {
       type: String,
       required: true,
@@ -86,6 +90,10 @@ const memberSchema = new mongoose.Schema(
       required: true,
     },
     occupation: {
+      type: String,
+      required: true,
+    },
+    spouseOccupation: {
       type: String,
       required: true,
     },
