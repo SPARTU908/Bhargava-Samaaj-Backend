@@ -18,7 +18,9 @@ const memberSchema = new mongoose.Schema(
     },
     spouseDob: {
       type: Date,
-      required: true,
+       required: function() {
+        return this.membership === "आजीवन सभासद - युगल-(पति-पत्नी) - 1000 रुपये";
+      },
     },
     pincode: {
       type: String,
@@ -95,7 +97,9 @@ const memberSchema = new mongoose.Schema(
     },
     spouseOccupation: {
       type: String,
-      required: true,
+       required: function() {
+        return this.membership === "आजीवन सभासद - युगल-(पति-पत्नी) - 1000 रुपये";
+      },
     },
     membership: {
       type: String,
