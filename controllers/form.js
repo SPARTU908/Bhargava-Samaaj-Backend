@@ -112,9 +112,6 @@ const reviewForm = async (req, res) => {
   }
 };
 
-
-
-
 const getPendingFormCount = async (req, res) => {
   try {
     const count = await UserForm.countDocuments({ status: "pending" });
@@ -317,6 +314,25 @@ const getDeletedForms = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await UserForm.find({
+      status: "approved",
+    });
+
+    res.status(200).json({
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error fetching approved users:", error);
+
+    res.status(500).json({
+      error: "Failed to fetch approved users",
+    });
+  }
+};
+
+
 module.exports = {
   saveFormData,
   getApprovedFormData,
@@ -331,5 +347,6 @@ module.exports = {
   requestResetOtp,
   verifyResetOtp,
   getDeletedForms,
+  getAllUsers,
 
 };
