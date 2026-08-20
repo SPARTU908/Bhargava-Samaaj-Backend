@@ -5,13 +5,12 @@ const {
   getPendingFormData,
   reviewForm,
   getDeletedForms,
- getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,
+ getPendingFormCount,getRejectedFormCount,getFormCount,getRejectedForms,updateUserDetails,deleteUser,requestResetOtp,verifyResetOtp,getAllUsers,
 } = require("../controllers/form.js");
 const { protect } = require('../middleware/authMiddleware');
 const upload = require("../middleware/upload.js");
 
 const router = express.Router();
-
 
 
 router.post(
@@ -39,6 +38,7 @@ router.get("/deleted",getDeletedForms);
 router.get("/approved/count",getFormCount);
 router.delete('/deleteUser/:id', deleteUser);
 router.post("/verify-reset-otp", verifyResetOtp);
+router.get("/all-users", getAllUsers);
 
 
 

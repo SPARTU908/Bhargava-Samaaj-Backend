@@ -19,6 +19,8 @@ const createLifeMember = async (req, res) => {
       Kuldevi,
       gender,
       category,
+      familyDetails,
+      
     } = req.body;
 
     const photoFile = req.files?.photo?.[0];
@@ -40,28 +42,31 @@ const createLifeMember = async (req, res) => {
       Kuldevi,
       gender,
       category,
+      familyDetails: familyDetails
+    ? JSON.parse(familyDetails)
+    : [],
       photo,
     });
 
     await newMember.save();
 
-    try {
-      await sendEmail({
-        to: Email,
-        subject: "Registration Confirmation - ABBS Life Membership",
-        html: `
-          <p>Dear ${Member_Name},</p>
-          <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
-          <p>We have successfully received your registration details.</p>
-          <p>Please keep this email for your reference.</p>
+    // try {
+    //   await sendEmail({
+    //     to: Email,
+    //     subject: "Registration Confirmation - ABBS Life Membership",
+    //     html: `
+    //       <p>Dear ${Member_Name},</p>
+    //       <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
+    //       <p>We have successfully received your registration details.</p>
+    //       <p>Please keep this email for your reference.</p>
           
-          <br/>
-          <p>Best regards,<br/>ABBS Conference Team</p>
-        `,
-      });
-    } catch (emailError) {
-      console.error("Error sending confirmation email:", emailError);
-    }
+    //       <br/>
+    //       <p>Best regards,<br/>ABBS Conference Team</p>
+    //     `,
+    //   });
+    // } catch (emailError) {
+    //   console.error("Error sending confirmation email:", emailError);
+    // }
 
     return res.status(201).json({
       message: "Life member registered successfully",
@@ -92,6 +97,16 @@ const searchLifeMember = async (req, res) => {
 const updateLifeMember = async (req, res) => {
   const { LM_NO } = req.params;
   const updateData = { ...req.body };
+  if (updateData.familyDetails) {
+  try {
+    updateData.familyDetails =
+      JSON.parse(updateData.familyDetails);
+  } catch (error) {
+    return res.status(400).json({
+      message: "Invalid family details format",
+    });
+  }
+}
 
   if (req.files && req.files.photo && req.files.photo[0]) {
     updateData.photo = req.files.photo[0].location;
@@ -107,21 +122,21 @@ const updateLifeMember = async (req, res) => {
     if (!updatedMember) {
       return res.status(404).json({ message: "Life member not found" });
     }
-    try {
-      await sendEmail({
-        to: updatedMember.Email,
-        subject: "Life Membership Update Confirmation - ABBS",
-        html: `
-          <p>Dear ${updatedMember.Member_Name},</p>
-          <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
-          <p>Your life membership details have been successfully updated.</p>
-          <br/>
-          <p>Best regards,<br/>ABBS Conference Team</p>
-        `,
-      });
-    } catch (emailError) {
-      console.error("Error sending update confirmation email:", emailError);
-    }
+    // try {
+    //   await sendEmail({
+    //     to: updatedMember.Email,
+    //     subject: "Life Membership Update Confirmation - ABBS",
+    //     html: `
+    //       <p>Dear ${updatedMember.Member_Name},</p>
+    //       <p>Thank you for registering for the 134th Annual Conference to be held at Ujjain on 20th, 21st, and 22nd December 2025.</p>
+    //       <p>Your life membership details have been successfully updated.</p>
+    //       <br/>
+    //       <p>Best regards,<br/>ABBS Conference Team</p>
+    //     `,
+    //   });
+    // } catch (emailError) {
+    //   console.error("Error sending update confirmation email:", emailError);
+    // }
 
     res.status(200).json({
       message: "Life member updated successfully",
