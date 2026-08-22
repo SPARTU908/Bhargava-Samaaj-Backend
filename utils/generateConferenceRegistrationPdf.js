@@ -3,7 +3,7 @@ const PDFDocument = require("pdfkit");
 const generateConferenceRegistrationPdf = (
   registration
 ) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const doc = new PDFDocument({
         size: "A4",
@@ -437,16 +437,42 @@ const generateConferenceRegistrationPdf = (
           ?.status
       );
 
-      addField(
-        "Registration Status",
-        registration.registrationStatus
-      );
+      // addField(
+      //   "Registration Status",
+      //   registration.registrationStatus
+      // );
 
-      addField(
-        "Payment Screenshot",
-        registration.payment
-          ?.screenshot
-      );
+      // addField(
+      //   "Payment Screenshot",
+      //   registration.payment
+      //     ?.screenshot
+      // );
+      if (registration.payment?.screenshot) {
+  try {
+    const response = await fetch(
+      registration.payment.screenshot
+    );
+
+    const arrayBuffer = await response.arrayBuffer();
+    const imageBuffer = Buffer.from(arrayBuffer);
+
+    doc.moveDown(0.5);
+
+    doc
+      .font("Helvetica-Bold")
+      .text("Payment Screenshot:");
+
+    doc.moveDown(0.5);
+
+    doc.image(imageBuffer, {
+      fit: [250, 250],
+    });
+
+    doc.moveDown();
+  } catch (error) {
+    console.log("Screenshot PDF error:", error);
+  }
+}
 
       if (
         registration.payment
@@ -527,25 +553,25 @@ const generateConferenceRegistrationPdf = (
       |--------------------------------------------------------------------------
       */
 
-      doc
-        .font("Helvetica")
-        .fontSize(8.5)
-        .fillColor("#666666")
-        .text(
-          "This document was generated automatically from the ABBS online conference registration system.",
-          {
-            align: "center",
-          }
-        );
+      // doc
+      //   .font("Helvetica")
+      //   .fontSize(8.5)
+      //   .fillColor("#666666")
+      //   .text(
+      //     "This document was generated automatically from the ABBS online conference registration system.",
+      //     {
+      //       align: "center",
+      //     }
+      //   );
 
       doc.moveDown(0.3);
 
-      doc.text(
-        "Please retain this document for registration and payment verification.",
-        {
-          align: "center",
-        }
-      );
+      // doc.text(
+      //   "Please retain this document for registration and payment verification.",
+      //   {
+      //     align: "center",
+      //   }
+      // );
 
       doc.end();
     } catch (error) {

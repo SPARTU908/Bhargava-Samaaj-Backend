@@ -547,7 +547,7 @@ const declineUrl =
 `;
 await sendEmail({
   to:
-    process.env.EMAIL_USER,
+    process.env.EMAIL_USER1,
 
   subject:
     `Conference Payment Verification - ${

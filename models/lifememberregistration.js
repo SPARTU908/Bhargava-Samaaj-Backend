@@ -181,4 +181,4 @@ const lifeMemberSchema = new mongoose.Schema(
   },
 );
 
-module.exports = mongoose.model("NewLifeMember", lifeMemberSchema);
+module.exports = mongoose.model("Conference26", lifeMemberSchema);
