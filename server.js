@@ -17,8 +17,8 @@ const vivahRoute = require("./routes/vivahMemberRegister");
 const registerUserRoute = require("./routes/lifememberregistration");
 const awardFormRoutes = require('./routes/awardForm');
 const magazineRoutes = require("./routes/magazineForm");
-const conferenceRegistrationRoutes =
-  require("./routes/conferenceRegistrationRoutes");
+const conferenceRegistrationRoutes = require("./routes/conferenceRegistrationRoutes");
+const duplicateMembershipRoutes = require("./routes/duplicateMembershipRoutes");
 
 const app = express();
 
@@ -108,6 +108,7 @@ app.use("/api/v1/register",registerUserRoute);
 app.use('/api/v1/award-form', awardFormRoutes);
 app.use('/api/v1/magazine-form',magazineRoutes);
 app.use("/api/conference-registration",conferenceRegistrationRoutes);
+app.use("/api/duplicate-membership",duplicateMembershipRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is working 🚀");
