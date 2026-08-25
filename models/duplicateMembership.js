@@ -53,7 +53,7 @@ const spouseSchema = new mongoose.Schema(
       default: "",
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const duplicateMembershipSchema = new mongoose.Schema(
@@ -126,6 +126,11 @@ const duplicateMembershipSchema = new mongoose.Schema(
       required: true,
     },
 
+    newPincode: {
+      type: String,
+      required: true,
+    },
+
     photo: {
       type: String,
       required: true,
@@ -186,12 +191,7 @@ const duplicateMembershipSchema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: [
-        "pending",
-        "submitted",
-        "verified",
-        "rejected",
-      ],
+      enum: ["pending", "submitted", "verified", "rejected"],
       default: "pending",
     },
 
@@ -217,17 +217,16 @@ const duplicateMembershipSchema = new mongoose.Schema(
       default: null,
     },
     adminRemarks: {
-    type: String,
-    default: "",
-},
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
-  }
-  
+  },
 );
 
 module.exports = mongoose.model(
   "DuplicateMembership",
-  duplicateMembershipSchema
+  duplicateMembershipSchema,
 );

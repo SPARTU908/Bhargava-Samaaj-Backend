@@ -39,6 +39,27 @@ const DuplicateMembership = require("../models/duplicateMembership");
 //   }
 // };
 
+const normalizeDob = (value = "") => {
+  if (!value) return "";
+
+  const cleaned = String(value)
+    .trim()
+    .replace(/[/-]/g, ".");
+
+  const parts = cleaned.split(".");
+
+  if (parts.length !== 3) {
+    return cleaned;
+  }
+
+  let [day, month, year] = parts;
+
+  day = String(Number(day));
+  month = String(Number(month));
+
+  return `${day}.${month}.${year}`;
+};
+
 
 
 const searchMemberByLmNo = async (req, res) => {
@@ -165,6 +186,99 @@ const escapeRegex = (value = "") => {
 //   }
 // };
 
+// const searchMemberByDetails = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       dob,
+//       mobile,
+//     } = req.body;
+
+//     console.log("SEARCH BODY:", req.body);
+
+//     if (!name || !name.trim()) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Name is required",
+//       });
+//     }
+
+//     const query = {
+//       Member_Name: {
+//         // partial name match
+//         $regex: escapeRegex(name.trim()),
+//         $options: "i",
+//       },
+//     };
+
+//     /*
+//       DOB/mobile optional hain because
+//       old Excel records me values missing ho sakti hain.
+//     */
+
+//     if (dob && dob.trim()) {
+//       query.Date_of_Birth = {
+//         $regex: escapeRegex(dob.trim()),
+//         $options: "i",
+//       };
+//     }
+
+//     if (mobile && mobile.trim()) {
+//       const cleanMobile = mobile
+//         .replace(/\D/g, "")
+//         .slice(-10);
+
+//       query.Contact_No = {
+//         $regex: cleanMobile,
+//         $options: "i",
+//       };
+//     }
+
+//     console.log(
+//       "FINAL QUERY:",
+//       JSON.stringify(query, null, 2)
+//     );
+
+//     const members =
+//       await LifeMemberMaster.find(query)
+//         .select(
+//           "LM_NO Member_Name Date_of_Birth Contact_No S_O_D_O_W_O Address CITY City Pin Email Gotra Kuldevi Occupation"
+//         )
+//         .limit(20)
+//         .lean();
+
+//     console.log(
+//       "MEMBERS FOUND:",
+//       members.length
+//     );
+
+//     if (!members.length) {
+//       return res.status(404).json({
+//         success: false,
+//         message:
+//           "दिए गए विवरण से कोई सदस्य नहीं मिला।",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       count: members.length,
+//       data: members,
+//     });
+
+//   } catch (error) {
+//     console.error(
+//       "Member detail search error:",
+//       error
+//     );
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// };
+
 const searchMemberByDetails = async (req, res) => {
   try {
     const {
@@ -173,7 +287,7 @@ const searchMemberByDetails = async (req, res) => {
       mobile,
     } = req.body;
 
-    console.log("SEARCH BODY:", req.body);
+   
 
     if (!name || !name.trim()) {
       return res.status(400).json({
@@ -184,26 +298,14 @@ const searchMemberByDetails = async (req, res) => {
 
     const query = {
       Member_Name: {
-        // partial name match
         $regex: escapeRegex(name.trim()),
         $options: "i",
       },
     };
 
-    /*
-      DOB/mobile optional hain because
-      old Excel records me values missing ho sakti hain.
-    */
-
-    if (dob && dob.trim()) {
-      query.Date_of_Birth = {
-        $regex: escapeRegex(dob.trim()),
-        $options: "i",
-      };
-    }
-
+    // Mobile optional
     if (mobile && mobile.trim()) {
-      const cleanMobile = mobile
+      const cleanMobile = String(mobile)
         .replace(/\D/g, "")
         .slice(-10);
 
@@ -213,23 +315,45 @@ const searchMemberByDetails = async (req, res) => {
       };
     }
 
-    console.log(
-      "FINAL QUERY:",
-      JSON.stringify(query, null, 2)
-    );
+    // console.log(
+    //   "FINAL QUERY:",
+    //   JSON.stringify(query, null, 2)
+    // );
 
-    const members =
+    let members =
       await LifeMemberMaster.find(query)
         .select(
           "LM_NO Member_Name Date_of_Birth Contact_No S_O_D_O_W_O Address CITY City Pin Email Gotra Kuldevi Occupation"
         )
-        .limit(20)
+        .limit(100)
         .lean();
 
-    console.log(
-      "MEMBERS FOUND:",
-      members.length
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | DOB FILTER AFTER NORMALIZATION
+    |--------------------------------------------------------------------------
+    */
+
+    if (dob && dob.trim()) {
+      const searchedDob =
+        normalizeDob(dob);
+
+      members = members.filter(
+        (member) => {
+          const dbDob =
+            normalizeDob(
+              member.Date_of_Birth
+            );
+
+          return dbDob === searchedDob;
+        }
+      );
+    }
+
+    // console.log(
+    //   "MEMBERS FOUND:",
+    //   members.length
+    // );
 
     if (!members.length) {
       return res.status(404).json({
@@ -286,6 +410,7 @@ const createDuplicateMembership = async (
       oldAddress,
       newAddress,
       pincode,
+      newPincode,
     } = req.body;
 
     // ----------------------------
@@ -304,7 +429,8 @@ const createDuplicateMembership = async (
       !kuldevi ||
       !oldAddress ||
       !newAddress ||
-      !pincode
+      !pincode ||
+      !newPincode
     ) {
       return res.status(400).json({
         success: false,
@@ -505,6 +631,7 @@ const createDuplicateMembership = async (
         oldAddress,
         newAddress,
         pincode,
+        newPincode,
 
         photo,
         aadharCard,
