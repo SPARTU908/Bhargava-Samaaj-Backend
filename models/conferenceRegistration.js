@@ -4,7 +4,7 @@ const conferenceMemberSchema = new mongoose.Schema(
   {
     registrationNumber: {
       type: String,
-      required: true,
+      default: "",
     },
 
     memberType: {

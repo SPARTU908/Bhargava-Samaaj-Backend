@@ -73,7 +73,7 @@ const createConferenceRegistration = async (req, res) => {
     |--------------------------------------------------------------------------
     */
 
-    const registrationNumbers = await generateRegistrationNumbers(totalMembers);
+    // const registrationNumbers = await generateRegistrationNumbers(totalMembers);
 
     /*
     |--------------------------------------------------------------------------
@@ -83,7 +83,8 @@ const createConferenceRegistration = async (req, res) => {
 
     const conferenceMembers = [
       {
-        registrationNumber: registrationNumbers[0],
+        // registrationNumber: registrationNumbers[0],
+        registrationNumber: "",
 
         memberType: "Primary",
 
@@ -118,7 +119,9 @@ const createConferenceRegistration = async (req, res) => {
 
     family.forEach((familyMember, index) => {
       conferenceMembers.push({
-        registrationNumber: registrationNumbers[index + 1],
+        // registrationNumber: registrationNumbers[index + 1],
+
+        registrationNumber: "",
 
         memberType: "Family",
 
@@ -180,9 +183,9 @@ const createConferenceRegistration = async (req, res) => {
 
       registrationId: registration._id,
 
-      primaryRegistrationNumber: registrationNumbers[0],
+      // primaryRegistrationNumber: registrationNumbers[0],
 
-      registrationNumbers,
+      // registrationNumbers,
 
       totalMembers,
 
@@ -271,15 +274,62 @@ const submitConferencePayment = async (req, res) => {
       });
     }
 
-    registration.payment.transactionId = transactionId.trim();
+    // registration.payment.transactionId = transactionId.trim();
 
-    registration.payment.screenshot = paymentScreenshot.location;
+    // registration.payment.screenshot = paymentScreenshot.location;
 
-    registration.payment.status = "submitted";
+    // registration.payment.status = "submitted";
 
-    registration.payment.submittedAt = new Date();
+    // registration.payment.submittedAt = new Date();
 
-    registration.registrationStatus = "payment_submitted";
+    // registration.registrationStatus = "payment_submitted";
+
+    /*
+|--------------------------------------------------------------------------
+| Generate Registration Numbers AFTER Payment
+|--------------------------------------------------------------------------
+*/
+
+const alreadyGenerated =
+  registration.members.every(
+    (member) => member.registrationNumber
+  );
+
+if (!alreadyGenerated) {
+  const registrationNumbers =
+    await generateRegistrationNumbers(
+      registration.totalMembers
+    );
+
+  registration.members.forEach(
+    (member, index) => {
+      member.registrationNumber =
+        registrationNumbers[index];
+    }
+  );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Save Payment
+|--------------------------------------------------------------------------
+*/
+
+registration.payment.transactionId =
+  transactionId.trim();
+
+registration.payment.screenshot =
+  paymentScreenshot.location;
+
+registration.payment.status = "submitted";
+
+registration.payment.submittedAt =
+  new Date();
+
+registration.registrationStatus =
+  "payment_submitted";
+
+
 
     const approvalToken = crypto.randomBytes(32).toString("hex");
 

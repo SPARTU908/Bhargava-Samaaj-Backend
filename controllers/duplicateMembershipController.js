@@ -91,6 +91,80 @@ const escapeRegex = (value = "") => {
 };
 
 
+// const searchMemberByDetails = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       dob,
+//       mobile,
+//     } = req.body;
+//     console.log("SEARCH BODY:", req.body);
+
+//     if (!name) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Name is required",
+//       });
+//     }
+
+//     const query = {
+//       Member_Name: {
+//         $regex: `^${escapeRegex(name.trim())}$`,
+//         $options: "i",
+//       },
+//     };
+
+   
+//     if (dob) {
+//       query.Date_of_Birth = {
+//         $regex: escapeRegex(dob.trim()),
+//         $options: "i",
+//       };
+//     }
+
+//     if (mobile) {
+//       query.Contact_No = {
+//         $regex: escapeRegex(
+//           mobile.replace(/\D/g, "").slice(-10)
+//         ),
+//         $options: "i",
+//       };
+//     }
+
+//     const members = await LifeMemberMaster.find(query)
+//       .select(
+//         "LM_NO Member_Name Date_of_Birth Contact_No S_O_D_O_W_O Address City Pin Email Gotra Kuldevi Occupation"
+//       )
+//       .limit(20)
+//       .lean();
+
+//     if (!members.length) {
+//       return res.status(404).json({
+//         success: false,
+//         message:
+//           "दिए गए विवरण से कोई सदस्य नहीं मिला।",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       count: members.length,
+//       data: members,
+//     });
+//   } catch (error) {
+//     console.error(
+//       "Member detail search error:",
+//       error
+//     );
+//     console.log("FINAL QUERY:", JSON.stringify(query, null, 2));
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// };
+
 const searchMemberByDetails = async (req, res) => {
   try {
     const {
@@ -99,7 +173,9 @@ const searchMemberByDetails = async (req, res) => {
       mobile,
     } = req.body;
 
-    if (!name) {
+    console.log("SEARCH BODY:", req.body);
+
+    if (!name || !name.trim()) {
       return res.status(400).json({
         success: false,
         message: "Name is required",
@@ -108,38 +184,52 @@ const searchMemberByDetails = async (req, res) => {
 
     const query = {
       Member_Name: {
-        $regex: `^${escapeRegex(name.trim())}$`,
+        // partial name match
+        $regex: escapeRegex(name.trim()),
         $options: "i",
       },
     };
 
     /*
-      DOB/mobile ko optional filter rakha hai because
-      old Excel records me inme se koi value missing ho sakti hai.
+      DOB/mobile optional hain because
+      old Excel records me values missing ho sakti hain.
     */
 
-    if (dob) {
+    if (dob && dob.trim()) {
       query.Date_of_Birth = {
         $regex: escapeRegex(dob.trim()),
         $options: "i",
       };
     }
 
-    if (mobile) {
+    if (mobile && mobile.trim()) {
+      const cleanMobile = mobile
+        .replace(/\D/g, "")
+        .slice(-10);
+
       query.Contact_No = {
-        $regex: escapeRegex(
-          mobile.replace(/\D/g, "").slice(-10)
-        ),
+        $regex: cleanMobile,
         $options: "i",
       };
     }
 
-    const members = await LifeMemberMaster.find(query)
-      .select(
-        "LM_NO Member_Name Date_of_Birth Contact_No S_O_D_O_W_O Address City Pin Email Gotra Kuldevi Occupation"
-      )
-      .limit(20)
-      .lean();
+    console.log(
+      "FINAL QUERY:",
+      JSON.stringify(query, null, 2)
+    );
+
+    const members =
+      await LifeMemberMaster.find(query)
+        .select(
+          "LM_NO Member_Name Date_of_Birth Contact_No S_O_D_O_W_O Address CITY City Pin Email Gotra Kuldevi Occupation"
+        )
+        .limit(20)
+        .lean();
+
+    console.log(
+      "MEMBERS FOUND:",
+      members.length
+    );
 
     if (!members.length) {
       return res.status(404).json({
@@ -154,6 +244,7 @@ const searchMemberByDetails = async (req, res) => {
       count: members.length,
       data: members,
     });
+
   } catch (error) {
     console.error(
       "Member detail search error:",
@@ -166,6 +257,7 @@ const searchMemberByDetails = async (req, res) => {
     });
   }
 };
+
 
 const createDuplicateMembership = async (
   req,
