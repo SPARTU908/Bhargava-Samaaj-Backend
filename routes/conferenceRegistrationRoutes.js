@@ -6,11 +6,15 @@ const {
   createConferenceRegistration,
   getConferenceRegistration,
   submitConferencePayment,handleConferenceAdminAction,
+  getAllConferenceRegistrations,
 } = require("../controllers/conferenceRegistrationController");
 
 const upload = require("../middleware/upload");
 
-
+router.get(
+  "/admin/all",
+  getAllConferenceRegistrations
+);
 router.post(
   "/create",
   createConferenceRegistration
@@ -54,10 +58,14 @@ router.post(
   submitConferencePayment
 );
 
+
+
 router.get(
   "/:id/admin-action",
   handleConferenceAdminAction
 );
+
+
 
 
 module.exports = router;

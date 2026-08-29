@@ -6,12 +6,6 @@ const generateRegistrationNumbers = require("../utils/generateRegistrationNumber
 
 const PRICE_PER_PERSON = 50;
 
-/*
-|--------------------------------------------------------------------------
-| Create Conference Registration
-|--------------------------------------------------------------------------
-*/
-
 const crypto = require("crypto");
 
 const sendEmail = require("../mailsend");
@@ -1086,9 +1080,40 @@ const handleConferenceAdminAction =
     }
   };
 
+const getAllConferenceRegistrations = async (req, res) => {
+  try {
+     const registrations =
+      await ConferenceRegistration.find({})
+        .sort({ createdAt: -1 })
+        .lean();
+
+   return res.status(200).json({
+      success: true,
+      total: registrations.length,
+      registrations: registrations,
+    });
+
+  } catch (error) {
+    console.error(
+      "GET ALL CONFERENCE REGISTRATIONS ERROR:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Unable to fetch conference registrations",
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+};
+
 module.exports = {
   createConferenceRegistration,
   getConferenceRegistration,
   submitConferencePayment,
   handleConferenceAdminAction,
+  getAllConferenceRegistrations,
+
 };
