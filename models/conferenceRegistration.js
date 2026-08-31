@@ -38,10 +38,10 @@ const conferenceMemberSchema = new mongoose.Schema(
       required: true,
     },
 
-    Card_Issued: {
-      type: String,
-      default: "",
-    },
+    // Card_Issued: {
+    //   type: String,
+    //   default: "",
+    // },
 
     S_O_D_O_W_O: {
       type: String,

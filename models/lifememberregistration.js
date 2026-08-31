@@ -20,10 +20,10 @@ const lifeMemberSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    Card_Issued: {
-      type: String,
-      required: true,
-    },
+    // Card_Issued: {
+    //   type: String,
+    //   required: true,
+    // },
     S_O_D_O_W_O: {
       type: String,
       required: true,
@@ -102,10 +102,10 @@ const lifeMemberSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-        Card_Issued: {
-          type: String,
-          required: true,
-        },
+        // Card_Issued: {
+        //   type: String,
+        //   required: true,
+        // },
         S_O_D_O_W_O: {
           type: String,
           required: true,
