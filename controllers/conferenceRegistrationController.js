@@ -1109,11 +1109,316 @@ const getAllConferenceRegistrations = async (req, res) => {
   }
 };
 
+// const checkApprovedConferenceRegistration = async (req, res) => {
+//   try {
+//     const { memberId } = req.params;
+
+//     if (!memberId) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Member ID is required",
+//       });
+//     }
+
+//     const registration = await ConferenceRegistration.findOne({
+//       primaryMemberId: memberId,
+//       registrationStatus: "approved",
+//       "payment.status": "verified",
+//     });
+
+//     if (!registration) {
+//       return res.status(200).json({
+//         success: true,
+//         alreadyRegistered: false,
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       alreadyRegistered: true,
+
+//       message:
+//         "You have already registered for the conference and your registration has been approved.",
+
+//       registrationId: registration._id,
+
+//       registrationStatus: registration.registrationStatus,
+
+//       paymentStatus: registration.payment.status,
+
+//       registrationNumbers: registration.members.map((member) => ({
+//         name: member.Member_Name,
+//         registrationNumber: member.registrationNumber,
+//       })),
+//     });
+//   } catch (error) {
+//     console.error(
+//       "Check approved conference registration error:",
+//       error,
+//     );
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Unable to check registration status",
+//       error: error.message,
+//     });
+//   }
+// };
+const checkApprovedConferenceRegistration = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+
+    if (!memberId) {
+      return res.status(400).json({
+        success: false,
+        message: "Member ID is required",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 1 - Approved registration ko first priority
+    |--------------------------------------------------------------------------
+    */
+
+    let registration = await ConferenceRegistration.findOne({
+      primaryMemberId: memberId,
+      registrationStatus: "approved",
+    }).sort({ updatedAt: -1 });
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 2 - Approved nahi mila to payment_submitted check karo
+    |--------------------------------------------------------------------------
+    */
+
+    if (!registration) {
+      registration = await ConferenceRegistration.findOne({
+        primaryMemberId: memberId,
+        registrationStatus: "payment_submitted",
+      }).sort({ updatedAt: -1 });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | No submitted / approved registration
+    |--------------------------------------------------------------------------
+    */
+
+    if (!registration) {
+      return res.status(200).json({
+        success: true,
+        alreadyRegistered: false,
+      });
+    }
+
+    let message = "";
+
+    if (registration.registrationStatus === "approved") {
+      message =
+        "You have already registered for the conference and your registration has been approved.";
+    } else if (
+      registration.registrationStatus === "payment_submitted"
+    ) {
+      message =
+        "Your registration form and payment have already been submitted. Please wait for approval.";
+    }
+
+    return res.status(200).json({
+      success: true,
+      alreadyRegistered: true,
+
+      message,
+
+      registrationId: registration._id,
+
+      registrationStatus:
+        registration.registrationStatus,
+
+      paymentStatus:
+        registration.payment?.status,
+
+      registrationNumbers:
+        registration.members?.map((member) => ({
+          name: member.Member_Name,
+          registrationNumber:
+            member.registrationNumber,
+        })) || [],
+    });
+
+  } catch (error) {
+    console.error(
+      "Check conference registration status error:",
+      error,
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Unable to check conference registration status",
+    });
+  }
+};
+
+
+const checkNonAbbsConferenceRegistration = async (req, res) => {
+  try {
+    const { email, contactNo } = req.query;
+
+    if (!email || !contactNo) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and mobile number are required",
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const normalizedContact = contactNo
+      .replace(/\D/g, "")
+      .trim();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Escape regex special characters
+    |--------------------------------------------------------------------------
+    */
+
+    const escapeRegex = (value) =>
+      value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 1 - APPROVED registration first priority
+    |--------------------------------------------------------------------------
+    |
+    | Directly ConferenceRegistration.members ke Primary Member ko
+    | Email + Mobile se check kar rahe hain.
+    |
+    */
+
+    let registration =
+      await ConferenceRegistration.findOne({
+        registrationStatus: "approved",
+
+        members: {
+          $elemMatch: {
+            memberType: "Primary",
+
+            Email: {
+              $regex: `^${escapeRegex(normalizedEmail)}$`,
+              $options: "i",
+            },
+
+            Contact_No: normalizedContact,
+          },
+        },
+      }).sort({
+        updatedAt: -1,
+      });
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 2 - PAYMENT SUBMITTED
+    |--------------------------------------------------------------------------
+    */
+
+    if (!registration) {
+      registration =
+        await ConferenceRegistration.findOne({
+          registrationStatus: "payment_submitted",
+
+          members: {
+            $elemMatch: {
+              memberType: "Primary",
+
+              Email: {
+                $regex: `^${escapeRegex(normalizedEmail)}$`,
+                $options: "i",
+              },
+
+              Contact_No: normalizedContact,
+            },
+          },
+        }).sort({
+          updatedAt: -1,
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nothing found
+    |--------------------------------------------------------------------------
+    */
+
+    if (!registration) {
+      return res.status(200).json({
+        success: true,
+        alreadyRegistered: false,
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Registration found
+    |--------------------------------------------------------------------------
+    */
+
+    const message =
+      registration.registrationStatus === "approved"
+        ? "You have already registered for the conference and your registration has been approved."
+        : "Your registration form and payment have already been submitted. Please wait for approval.";
+
+    return res.status(200).json({
+      success: true,
+
+      alreadyRegistered: true,
+
+      message,
+
+      registrationId:
+        registration._id,
+
+      primaryMemberId:
+        registration.primaryMemberId,
+
+      registrationStatus:
+        registration.registrationStatus,
+
+      paymentStatus:
+        registration.payment?.status,
+
+      registrationNumbers:
+        registration.members?.map(
+          (item) => ({
+            name: item.Member_Name,
+            registrationNumber:
+              item.registrationNumber,
+          }),
+        ) || [],
+    });
+
+  } catch (error) {
+    console.error(
+      "Check Non-ABBS registration error:",
+      error,
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Unable to check registration status",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createConferenceRegistration,
   getConferenceRegistration,
   submitConferencePayment,
   handleConferenceAdminAction,
   getAllConferenceRegistrations,
-
+  checkApprovedConferenceRegistration,
+ checkNonAbbsConferenceRegistration,
 };

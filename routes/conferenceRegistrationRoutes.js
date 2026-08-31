@@ -7,6 +7,8 @@ const {
   getConferenceRegistration,
   submitConferencePayment,handleConferenceAdminAction,
   getAllConferenceRegistrations,
+  checkApprovedConferenceRegistration,
+  checkNonAbbsConferenceRegistration,
 } = require("../controllers/conferenceRegistrationController");
 
 const upload = require("../middleware/upload");
@@ -18,6 +20,16 @@ router.get(
 router.post(
   "/create",
   createConferenceRegistration
+);
+
+router.get(
+  "/check-approved/:memberId",
+  checkApprovedConferenceRegistration,
+);
+
+router.get(
+  "/check-non-abbs",
+  checkNonAbbsConferenceRegistration,
 );
 
 
@@ -64,6 +76,8 @@ router.get(
   "/:id/admin-action",
   handleConferenceAdminAction
 );
+
+
 
 
 
