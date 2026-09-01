@@ -88,7 +88,7 @@ const createConferenceRegistration = async (req, res) => {
         Year: member.Year || "",
         Title: member.Title || "",
         Member_Name: member.Member_Name || "",
-        // Card_Issued: member.Card_Issued || "",
+       
         S_O_D_O_W_O: member.S_O_D_O_W_O || "",
         Date_of_Birth: member.Date_of_Birth || "",
         Address: member.Address || "",
@@ -125,7 +125,7 @@ const createConferenceRegistration = async (req, res) => {
         Year: familyMember.Year || "",
         Title: familyMember.Title || "",
         Member_Name: familyMember.Member_Name || "",
-        // Card_Issued: familyMember.Card_Issued || "",
+       
         S_O_D_O_W_O: familyMember.S_O_D_O_W_O || "",
         Date_of_Birth: familyMember.Date_of_Birth || "",
         Address: familyMember.Address || "",
