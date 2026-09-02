@@ -555,7 +555,7 @@ const declineUrl =
         font-weight:bold;
       "
     >
-      â Approve Registration
+      ✓ Approve Registration
     </a>
 
     <a
@@ -571,7 +571,7 @@ const declineUrl =
         font-weight:bold;
       "
     >
-      â Decline Registration
+      ✕ Decline Registration
     </a>
 
   </div>
@@ -943,7 +943,7 @@ const handleConferenceAdminAction =
               "
             >
               <h1 style="color:#198754;">
-                â Registration Approved
+                ✓ Registration Approved
               </h1>
 
               <p>
@@ -1510,79 +1510,6 @@ const checkByNameDobConferenceRegistration = async (req, res) => {
 
     if (registration) {
       matchedMember = registration.members.find(
-        (member) =>
-          nameRegex.test(member.Member_Name || "") &&
-          (member.Date_of_Birth || "").split("T")[0] === normalizedDob,
-      );
-
-      if (!matchedMember) {
-        registration = null;
-      }
-    }
-
-    if (!registration || !matchedMember) {
-      return res.status(200).json({
-        success: true,
-        alreadyRegistered: false,
-      });
-    }
-
-    const message =
-      registration.registrationStatus === "approved"
-        ? "A registration with this name and date of birth has already been approved for the conference."
-        : "A registration with this name and date of birth has already been submitted and is awaiting approval.";
-
-    return res.status(200).json({
-      success: true,
-
-      alreadyRegistered: true,
-
-      message,
-
-      registrationId: registration._id,
-
-      registrationStatus: registration.registrationStatus,
-
-      paymentStatus: registration.payment?.status,
-
-      matchedMember: {
-        name: matchedMember.Member_Name,
-        relation:
-          matchedMember.memberType === "Primary"
-            ? "Primary"
-            : matchedMember.relation || "Family",
-      },
-
-      registrationNumbers:
-        registration.members?.map((item) => ({
-          name: item.Member_Name,
-          registrationNumber: item.registrationNumber,
-        })) || [],
-    });
-  } catch (error) {
-    console.error(
-      "Check by name/DOB conference registration error:",
-      error,
-    );
-
-    return res.status(500).json({
-      success: false,
-      message: "Unable to check registration status",
-      error: error.message,
-    });
-  }
-};
-
-module.exports = {
-  createConferenceRegistration,
-  getConferenceRegistration,
-  submitConferencePayment,
-  handleConferenceAdminAction,
-  getAllConferenceRegistrations,
-  checkApprovedConferenceRegistration,
- checkNonAbbsConferenceRegistration,
- checkByNameDobConferenceRegistration,
-};
         (member) =>
           nameRegex.test(member.Member_Name || "") &&
           (member.Date_of_Birth || "").split("T")[0] === normalizedDob,
