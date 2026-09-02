@@ -9,6 +9,7 @@ const {
   getAllConferenceRegistrations,
   checkApprovedConferenceRegistration,
   checkNonAbbsConferenceRegistration,
+  checkByNameDobConferenceRegistration,
 } = require("../controllers/conferenceRegistrationController");
 
 const upload = require("../middleware/upload");
@@ -30,6 +31,11 @@ router.get(
 router.get(
   "/check-non-abbs",
   checkNonAbbsConferenceRegistration,
+);
+
+router.get(
+  "/check-by-name-dob",
+  checkByNameDobConferenceRegistration,
 );
 
 

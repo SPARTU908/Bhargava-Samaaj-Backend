@@ -1413,6 +1413,166 @@ const checkNonAbbsConferenceRegistration = async (req, res) => {
   }
 };
 
+/*
+|--------------------------------------------------------------------------
+| Check By Name + Date of Birth
+|--------------------------------------------------------------------------
+|
+| Used when there is no LM_NO to look up (Non-ABBS primary members, and
+| family members added without an ABBS Life Membership Number). Matches
+| against every member already saved on any conference registration
+| (both Primary and Family entries), not just primary members.
+|
+*/
+
+const checkByNameDobConferenceRegistration = async (req, res) => {
+  try {
+    const { name, dob } = req.query;
+
+    if (!name || !dob) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and date of birth are required",
+      });
+    }
+
+    const normalizedName = name.trim().replace(/\s+/g, " ");
+
+    const normalizedDob = dob.trim().split("T")[0];
+
+    if (!normalizedName || !normalizedDob) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and date of birth are required",
+      });
+    }
+
+    const escapeRegex = (value) =>
+      value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    // Build the pattern piece-by-piece so any run of whitespace in the
+    // stored name (extra/irregular spacing) still matches a normalized
+    // single-space query name, instead of requiring an exact byte match.
+    const namePattern = normalizedName
+      .split(" ")
+      .map(escapeRegex)
+      .join("\\s+");
+
+    const nameRegex = new RegExp(`^\\s*${namePattern}\\s*$`, "i");
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 1 - APPROVED registration first priority
+    |--------------------------------------------------------------------------
+    */
+
+    let registration = await ConferenceRegistration.findOne({
+      registrationStatus: "approved",
+
+      members: {
+        $elemMatch: {
+          Member_Name: nameRegex,
+        },
+      },
+    }).sort({ updatedAt: -1 });
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 2 - PAYMENT SUBMITTED
+    |--------------------------------------------------------------------------
+    */
+
+    if (!registration) {
+      registration = await ConferenceRegistration.findOne({
+        registrationStatus: "payment_submitted",
+
+        members: {
+          $elemMatch: {
+            Member_Name: nameRegex,
+          },
+        },
+      }).sort({ updatedAt: -1 });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Confirm the Date of Birth match on the specific member
+    |--------------------------------------------------------------------------
+    |
+    | Mongo can match Member_Name via $elemMatch, but comparing
+    | Date_of_Birth strings that may carry a full ISO timestamp needs a
+    | normalized comparison, so it's done here in JS against the matched
+    | document's members.
+    |
+    */
+
+    let matchedMember = null;
+
+    if (registration) {
+      matchedMember = registration.members.find(
+        (member) =>
+          nameRegex.test(member.Member_Name || "") &&
+          (member.Date_of_Birth || "").split("T")[0] === normalizedDob,
+      );
+
+      if (!matchedMember) {
+        registration = null;
+      }
+    }
+
+    if (!registration || !matchedMember) {
+      return res.status(200).json({
+        success: true,
+        alreadyRegistered: false,
+      });
+    }
+
+    const message =
+      registration.registrationStatus === "approved"
+        ? "A registration with this name and date of birth has already been approved for the conference."
+        : "A registration with this name and date of birth has already been submitted and is awaiting approval.";
+
+    return res.status(200).json({
+      success: true,
+
+      alreadyRegistered: true,
+
+      message,
+
+      registrationId: registration._id,
+
+      registrationStatus: registration.registrationStatus,
+
+      paymentStatus: registration.payment?.status,
+
+      matchedMember: {
+        name: matchedMember.Member_Name,
+        relation:
+          matchedMember.memberType === "Primary"
+            ? "Primary"
+            : matchedMember.relation || "Family",
+      },
+
+      registrationNumbers:
+        registration.members?.map((item) => ({
+          name: item.Member_Name,
+          registrationNumber: item.registrationNumber,
+        })) || [],
+    });
+  } catch (error) {
+    console.error(
+      "Check by name/DOB conference registration error:",
+      error,
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to check registration status",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createConferenceRegistration,
   getConferenceRegistration,
@@ -1421,4 +1581,5 @@ module.exports = {
   getAllConferenceRegistrations,
   checkApprovedConferenceRegistration,
  checkNonAbbsConferenceRegistration,
+ checkByNameDobConferenceRegistration,
 };
