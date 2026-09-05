@@ -104,7 +104,7 @@ const generateConferenceRegistrationPdf = (
         .font("Helvetica")
         .fontSize(11)
         .text(
-          "135th Annual Conference - Ujjain",
+          "135th Annual Conference - Jaipur",
           {
             align: "center",
           }
