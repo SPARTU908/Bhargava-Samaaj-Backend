@@ -1,5 +1,10 @@
 const LifeMemberMaster = require("../models/LifeMemberMaster");
 const DuplicateMembership = require("../models/duplicateMembership");
+
+// Collapse any whitespace (spaces, tabs, line breaks) so names like
+// "SEEMA\nBHARGAVA" in the master data match "SEEMA BHARGAVA" / "SEEMA\r\nBHARGAVA".
+const normalizeName = (value = "") =>
+  String(value).replace(/\s+/g, " ").trim().toLowerCase();
 // const searchMemberByLmNo = async (req, res) => {
 //   try {
 //     let { lmNo } = req.params;
@@ -460,14 +465,11 @@ const createDuplicateMembership = async (
     // Prevent member mismatch
     // ----------------------------
 
-    const masterName =
+    const masterName = normalizeName(
       masterMember.Member_Name
-        ?.trim()
-        .toLowerCase();
+    );
 
-    const submittedName = name
-      .trim()
-      .toLowerCase();
+    const submittedName = normalizeName(name);
 
     if (
       masterName &&
@@ -537,16 +539,13 @@ const createDuplicateMembership = async (
         });
       }
 
-      const masterSpouseName =
+      const masterSpouseName = normalizeName(
         spouseMaster.Member_Name
-          ?.trim()
-          .toLowerCase();
+      );
 
       if (
         masterSpouseName &&
-        spouseName
-          .trim()
-          .toLowerCase() !==
+        normalizeName(spouseName) !==
           masterSpouseName
       ) {
         return res.status(400).json({
