@@ -57,12 +57,12 @@ const lifeMemberSchema = new mongoose.Schema(
     },
     Gotra: {
       type: String,
-      required: true,
+      required: false,
     },
 
     Kuldevi: {
       type: String,
-      required: true,
+      required: false,
     },
 
     gender: {
@@ -136,12 +136,12 @@ const lifeMemberSchema = new mongoose.Schema(
         },
         Gotra: {
           type: String,
-          required: true,
+          required: false,
         },
 
         Kuldevi: {
           type: String,
-          required: true,
+          required: false,
         },
 
         gender: {
