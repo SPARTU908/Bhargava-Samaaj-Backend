@@ -12,6 +12,64 @@ const sendEmail = require("../mailsend");
 
 const generateConferenceRegistrationPdf = require("../utils/generateConferenceRegistrationPdf");
 
+/*
+|--------------------------------------------------------------------------
+| Find an existing (approved / payment_submitted) registration that already
+| includes this person — as the Primary OR as a Family member on someone
+| else's registration. Matches by LM_NO first, then Name + DOB fallback for
+| family entries saved without an LM_NO.
+|--------------------------------------------------------------------------
+*/
+
+const escapeRegexStr = (value = "") =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const findExistingRegistrationForPerson = async ({ memberId, LM_NO, name, dob }) => {
+  const or = [];
+  if (memberId) or.push({ primaryMemberId: memberId });
+
+  const lm = (LM_NO || "").trim();
+  if (lm) or.push({ members: { $elemMatch: { LM_NO: lm } } });
+
+  const cleanName = (name || "").trim().replace(/\s+/g, " ");
+  const cleanDob = (dob || "").trim().split("T")[0];
+  let nameRegex = null;
+  if (cleanName && cleanDob) {
+    nameRegex = new RegExp(
+      `^\\s*${cleanName.split(" ").map(escapeRegexStr).join("\\s+")}\\s*$`,
+      "i",
+    );
+    or.push({ members: { $elemMatch: { Member_Name: nameRegex } } });
+  }
+
+  if (!or.length) return null;
+
+  for (const status of ["approved", "payment_submitted"]) {
+    const candidates = await ConferenceRegistration.find({
+      registrationStatus: status,
+      $or: or,
+    }).sort({ updatedAt: -1 });
+
+    for (const reg of candidates) {
+      const matched = reg.members.find(
+        (m) =>
+          (lm && (m.LM_NO || "").trim() === lm) ||
+          (nameRegex &&
+            nameRegex.test(m.Member_Name || "") &&
+            (m.Date_of_Birth || "").split("T")[0] === cleanDob),
+      );
+      if (matched) return { registration: reg, matchedMember: matched };
+      if (memberId && String(reg.primaryMemberId) === String(memberId)) {
+        return {
+          registration: reg,
+          matchedMember: reg.members.find((m) => m.memberType === "Primary"),
+        };
+      }
+    }
+  }
+  return null;
+};
+
 const createConferenceRegistration = async (req, res) => {
   try {
     const { memberId, familyDetails } = req.body;
@@ -41,6 +99,28 @@ const createConferenceRegistration = async (req, res) => {
       } catch (error) {
         return res.status(400).json({
           message: "Invalid family details format",
+        });
+      }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Duplicate guard - primary and every family member
+    |--------------------------------------------------------------------------
+    */
+
+    const people = [
+      { memberId: member._id, LM_NO: member.LM_NO, name: member.Member_Name, dob: member.Date_of_Birth },
+      ...family.map((f) => ({ LM_NO: f.LM_NO, name: f.Member_Name, dob: f.Date_of_Birth })),
+    ];
+
+    for (const person of people) {
+      const existing = await findExistingRegistrationForPerson(person);
+      if (existing) {
+        return res.status(409).json({
+          alreadyRegistered: true,
+          message: `${existing.matchedMember?.Member_Name || person.name} is already registered for the conference (registration status: ${existing.registration.registrationStatus}).`,
+          registrationId: existing.registration._id,
         });
       }
     }
@@ -1181,29 +1261,17 @@ const checkApprovedConferenceRegistration = async (req, res) => {
     |--------------------------------------------------------------------------
     */
 
-    let registration = await ConferenceRegistration.findOne({
-      primaryMemberId: memberId,
-      registrationStatus: "approved",
-    }).sort({ updatedAt: -1 });
+    const person = await NewLifeMember.findById(memberId);
 
-    /*
-    |--------------------------------------------------------------------------
-    | STEP 2 - Approved nahi mila to payment_submitted check karo
-    |--------------------------------------------------------------------------
-    */
+    const found = await findExistingRegistrationForPerson({
+      memberId,
+      LM_NO: person?.LM_NO,
+      name: person?.Member_Name,
+      dob: person?.Date_of_Birth,
+    });
 
-    if (!registration) {
-      registration = await ConferenceRegistration.findOne({
-        primaryMemberId: memberId,
-        registrationStatus: "payment_submitted",
-      }).sort({ updatedAt: -1 });
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | No submitted / approved registration
-    |--------------------------------------------------------------------------
-    */
+    const registration = found?.registration || null;
+    const matchedMember = found?.matchedMember || null;
 
     if (!registration) {
       return res.status(200).json({
@@ -1222,6 +1290,11 @@ const checkApprovedConferenceRegistration = async (req, res) => {
     ) {
       message =
         "Your registration form and payment have already been submitted. Please wait for approval.";
+    }
+
+    if (matchedMember && matchedMember.memberType === "Family") {
+      const primary = registration.members.find((m) => m.memberType === "Primary");
+      message = `You have already been registered for the conference by ${primary?.Member_Name || "a family member"} (as ${matchedMember.relation || "family member"}). Status: ${registration.registrationStatus === "approved" ? "approved" : "payment submitted, awaiting approval"}.`;
     }
 
     return res.status(200).json({
