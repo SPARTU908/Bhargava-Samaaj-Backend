@@ -1382,9 +1382,177 @@ const normalizeDob = (value = "") => {
   return "";
 };
 
+/*
+|--------------------------------------------------------------------------
+| Legacy email + mobile check (unchanged from before)
+|--------------------------------------------------------------------------
+|
+| Only used when a request arrives without a name, i.e. from an older
+| frontend build that still sends { email, contactNo }. Safe to delete once
+| the updated frontend is deployed everywhere.
+|
+*/
+
+const legacyCheckNonAbbsByEmailContact = async (req, res) => {
+  try {
+    const { email, contactNo } = req.query;
+
+    if (!email || !contactNo) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and mobile number are required",
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const normalizedContact = contactNo
+      .replace(/\D/g, "")
+      .trim();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Escape regex special characters
+    |--------------------------------------------------------------------------
+    */
+
+    const escapeRegex = (value) =>
+      value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 1 - APPROVED registration first priority
+    |--------------------------------------------------------------------------
+    |
+    | Directly ConferenceRegistration.members ke Primary Member ko
+    | Email + Mobile se check kar rahe hain.
+    |
+    */
+
+    let registration =
+      await ConferenceRegistration.findOne({
+        registrationStatus: "approved",
+
+        members: {
+          $elemMatch: {
+            memberType: "Primary",
+
+            Email: {
+              $regex: `^${escapeRegex(normalizedEmail)}$`,
+              $options: "i",
+            },
+
+            Contact_No: normalizedContact,
+          },
+        },
+      }).sort({
+        updatedAt: -1,
+      });
+
+    /*
+    |--------------------------------------------------------------------------
+    | STEP 2 - PAYMENT SUBMITTED
+    |--------------------------------------------------------------------------
+    */
+
+    if (!registration) {
+      registration =
+        await ConferenceRegistration.findOne({
+          registrationStatus: "payment_submitted",
+
+          members: {
+            $elemMatch: {
+              memberType: "Primary",
+
+              Email: {
+                $regex: `^${escapeRegex(normalizedEmail)}$`,
+                $options: "i",
+              },
+
+              Contact_No: normalizedContact,
+            },
+          },
+        }).sort({
+          updatedAt: -1,
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nothing found
+    |--------------------------------------------------------------------------
+    */
+
+    if (!registration) {
+      return res.status(200).json({
+        success: true,
+        alreadyRegistered: false,
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Registration found
+    |--------------------------------------------------------------------------
+    */
+
+    const message =
+      registration.registrationStatus === "approved"
+        ? "You have already registered for the conference and your registration has been approved."
+        : "Your registration form and payment have already been submitted. Please wait for approval.";
+
+    return res.status(200).json({
+      success: true,
+
+      alreadyRegistered: true,
+
+      message,
+
+      registrationId:
+        registration._id,
+
+      primaryMemberId:
+        registration.primaryMemberId,
+
+      registrationStatus:
+        registration.registrationStatus,
+
+      paymentStatus:
+        registration.payment?.status,
+
+      registrationNumbers:
+        registration.members?.map(
+          (item) => ({
+            name: item.Member_Name,
+            registrationNumber:
+              item.registrationNumber,
+          }),
+        ) || [],
+    });
+
+  } catch (error) {
+    console.error(
+      "Check Non-ABBS registration error:",
+      error,
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Unable to check registration status",
+      error: error.message,
+    });
+  }
+};
+
 const checkNonAbbsConferenceRegistration = async (req, res) => {
   try {
     const { name, dob, soDoWo } = req.query;
+
+    // Older frontend builds send only email + contactNo.
+    if (!name && req.query.email && req.query.contactNo) {
+      return legacyCheckNonAbbsByEmailContact(req, res);
+    }
 
     const cleanName = normalizePersonName(name);
     const cleanDob = normalizeDob(dob);
@@ -1452,10 +1620,14 @@ const checkNonAbbsConferenceRegistration = async (req, res) => {
         ? "and the registration has been approved"
         : "and the payment has been submitted. Please wait for approval";
 
+    const displayName = String(matchedMember.Member_Name || "")
+      .replace(/\s+/g, " ")
+      .trim();
+
     const message =
       matchedMember.memberType === "Primary"
-        ? `${matchedMember.Member_Name} is already registered for the conference ${statusText}.`
-        : `${matchedMember.Member_Name} is already registered for the conference as a family member (${matchedMember.relation || "Family"}) ${statusText}.`;
+        ? `${displayName} is already registered for the conference ${statusText}.`
+        : `${displayName} is already registered for the conference as a family member (${matchedMember.relation || "Family"}) ${statusText}.`;
 
     return res.status(200).json({
       success: true,
