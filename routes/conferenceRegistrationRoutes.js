@@ -14,8 +14,12 @@ const {
 
 const upload = require("../middleware/upload");
 
+const { protect } = require("../middleware/authMiddleware");
+
+// Admin only: returns every registrant's personal and payment details.
 router.get(
   "/admin/all",
+  protect(["superadmin", "conferenceadmin"]),
   getAllConferenceRegistrations
 );
 router.post(

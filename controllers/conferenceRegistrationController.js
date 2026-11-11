@@ -1164,6 +1164,9 @@ const getAllConferenceRegistrations = async (req, res) => {
   try {
      const registrations =
       await ConferenceRegistration.find({})
+        // approval.token is the secret in the emailed approve/reject link;
+        // the dashboard never needs it.
+        .select("-approval.token")
         .sort({ createdAt: -1 })
         .lean();
 
@@ -1183,8 +1186,6 @@ const getAllConferenceRegistrations = async (req, res) => {
       success: false,
       message:
         "Unable to fetch conference registrations",
-      error: error.message,
-      stack: error.stack,
     });
   }
 };
