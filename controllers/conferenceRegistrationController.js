@@ -1334,7 +1334,66 @@ const checkApprovedConferenceRegistration = async (req, res) => {
 };
 
 
-const checkNonAbbsConferenceRegistration = async (req, res) => {
+/*
+|--------------------------------------------------------------------------
+| Non-ABBS duplicate check helpers
+|--------------------------------------------------------------------------
+|
+| Families often share one email + mobile number, so those can't identify a
+| person. A non-ABBS registrant is treated as a duplicate only when an
+| existing (approved / payment_submitted) registration has a member with the
+| same Member_Name AND either the same Date_of_Birth or the same
+| S_O_D_O_W_O. Stored data is inconsistent (DOB as "1990-05-19" or
+| "19.5.1990", S/O as "S/O Mr. X" or just "X"), so values are normalized.
+|
+*/
+
+const TITLE_WORDS =
+  /\b(mr|mrs|ms|miss|shri|sri|shree|sh|smt|late|lt|dr|swargiya|sw|kumari|km)\b/g;
+
+const normalizePersonName = (value = "") =>
+  String(value)
+    .toLowerCase()
+    .replace(/[.,]/g, " ")
+    .replace(TITLE_WORDS, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const normalizeRelationName = (value = "") =>
+  normalizePersonName(
+    String(value)
+      .toLowerCase()
+      .replace(/[\r\n]+/g, " ")
+      // strip a leading "S/O", "D/O", "W/O", "S.O.", "SO" etc.
+      .replace(/^\s*[sdw]\s*[\/.\-]?\s*o\b\.?/, " "),
+  );
+
+const normalizeDob = (value = "") => {
+  const raw = String(value).trim().split("T")[0];
+  const pad = (n) => String(n).padStart(2, "0");
+
+  let m = raw.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
+  if (m) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+
+  // Indian style D.M.YYYY / D-M-YYYY / D/M/YYYY
+  m = raw.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);
+  if (m) return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+
+  return "";
+};
+
+/*
+|--------------------------------------------------------------------------
+| Legacy email + mobile check (unchanged from before)
+|--------------------------------------------------------------------------
+|
+| Only used when a request arrives without a name, i.e. from an older
+| frontend build that still sends { email, contactNo }. Safe to delete once
+| the updated frontend is deployed everywhere.
+|
+*/
+
+const legacyCheckNonAbbsByEmailContact = async (req, res) => {
   try {
     const { email, contactNo } = req.query;
 
@@ -1481,6 +1540,130 @@ const checkNonAbbsConferenceRegistration = async (req, res) => {
       success: false,
       message:
         "Unable to check registration status",
+      error: error.message,
+    });
+  }
+};
+
+const checkNonAbbsConferenceRegistration = async (req, res) => {
+  try {
+    const { name, dob, soDoWo } = req.query;
+
+    // Older frontend builds send only email + contactNo.
+    if (!name && req.query.email && req.query.contactNo) {
+      return legacyCheckNonAbbsByEmailContact(req, res);
+    }
+
+    const cleanName = normalizePersonName(name);
+    const cleanDob = normalizeDob(dob);
+    const cleanRelation = normalizeRelationName(soDoWo);
+
+    if (!cleanName || (!cleanDob && !cleanRelation)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Name and either date of birth or S/O, D/O, W/O are required",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Narrow candidates by name in Mongo, then confirm DOB / relation in JS
+    |--------------------------------------------------------------------------
+    */
+
+    // Loose pre-filter (every name word, in order); the exact comparison
+    // happens in isSamePerson below. [\s\S] rather than "." because some
+    // stored names contain line breaks ("NISHA\r\nBHARGAVA").
+    const nameRegex = new RegExp(
+      cleanName.split(" ").map(escapeRegexStr).join("[\\s\\S]*"),
+      "i",
+    );
+
+    const isSamePerson = (member) =>
+      normalizePersonName(member.Member_Name) === cleanName &&
+      ((cleanDob && normalizeDob(member.Date_of_Birth) === cleanDob) ||
+        (cleanRelation &&
+          normalizeRelationName(member.S_O_D_O_W_O) === cleanRelation));
+
+    let registration = null;
+    let matchedMember = null;
+
+    // Approved registrations take priority over payment_submitted ones.
+    for (const status of ["approved", "payment_submitted"]) {
+      const candidates = await ConferenceRegistration.find({
+        registrationStatus: status,
+        members: { $elemMatch: { Member_Name: nameRegex } },
+      }).sort({ updatedAt: -1 });
+
+      for (const reg of candidates) {
+        const found = (reg.members || []).find(isSamePerson);
+        if (found) {
+          registration = reg;
+          matchedMember = found;
+          break;
+        }
+      }
+
+      if (registration) break;
+    }
+
+    if (!registration) {
+      return res.status(200).json({
+        success: true,
+        alreadyRegistered: false,
+      });
+    }
+
+    const statusText =
+      registration.registrationStatus === "approved"
+        ? "and the registration has been approved"
+        : "and the payment has been submitted. Please wait for approval";
+
+    const displayName = String(matchedMember.Member_Name || "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const message =
+      matchedMember.memberType === "Primary"
+        ? `${displayName} is already registered for the conference ${statusText}.`
+        : `${displayName} is already registered for the conference as a family member (${matchedMember.relation || "Family"}) ${statusText}.`;
+
+    return res.status(200).json({
+      success: true,
+
+      alreadyRegistered: true,
+
+      message,
+
+      registrationId: registration._id,
+
+      primaryMemberId: registration.primaryMemberId,
+
+      registrationStatus: registration.registrationStatus,
+
+      paymentStatus: registration.payment?.status,
+
+      matchedMember: {
+        name: matchedMember.Member_Name,
+        relation:
+          matchedMember.memberType === "Primary"
+            ? "Primary"
+            : matchedMember.relation || "Family",
+      },
+
+      registrationNumbers:
+        registration.members?.map((item) => ({
+          name: item.Member_Name,
+          registrationNumber: item.registrationNumber,
+        })) || [],
+    });
+  } catch (error) {
+    console.error("Check Non-ABBS registration error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to check registration status",
       error: error.message,
     });
   }
